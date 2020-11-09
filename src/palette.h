@@ -9,6 +9,8 @@
 #include "imgui.h"
 
 
+namespace
+{
 std::map<std::string, ImColor> g_palette;
 
 
@@ -39,3 +41,4 @@ void load_palette(const char* filename)
   }
 }
 
+}
