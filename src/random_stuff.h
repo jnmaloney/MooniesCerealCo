@@ -14,6 +14,7 @@
 #include <boost/uuid/uuid_io.hpp>
 
 #include "game_screens.h"
+#include "actions.h"
 
 
 int fulfil(int location, int amount)
@@ -34,23 +35,9 @@ int fulfil(int location, int amount)
 }
 
 
-void pickup_cargo(Order& order)
-{
-  // ?? needs to adjust "cargo in transit"
-  int cost = fulfil(order.pickup_location, order.pickup_amount);
-  g_gameData.current_week_data.spent += cost; 
-}
-
-
-void return_cargo(Order& order)
-{
-  g_gameData.current_week_data.moon_rocks_collected += order.pickup_amount;  
-}
-
-
 void process_puffs()
 {
-  int process_rate = 1600;
+  int process_rate = 285;
   int processed;
   if (process_rate > g_gameData.current_week_data.moon_rocks_total)
   {
@@ -69,7 +56,9 @@ void process_puffs()
 
 void sell_puffs()
 {
-  g_gameData.current_week_data.sales = 25 * g_gameData.current_week_data.processing_rate;
+  //g_gameData.current_week_data.sales = 25 * g_gameData.current_week_data.processing_rate;
+
+  g_gameData.cash += 20 * g_gameData.current_week_data.processing_rate;
 }
 
 
@@ -107,82 +96,30 @@ void upgrade_ship(int upgrade, int cost)
 }
 
 
-void end_week()
+// ??
+void process_launch(Ship& i)
 {
-  // Create the order list
+  g_gameData.launches.push_back(
+          (Launch){ i, i.order, g_gameData.time, g_gameData.time + i.data.transit_time, g_gameData.time + 2 * i.data.transit_time, false, false }
+        );
+  g_gameData.current_week_data.spent += i.data.value; // ?? launch_cost
+  i.data.location = 1;  
+}
+
+
+// ??
+void process_launch_list()
+{
   for (auto& i: g_gameData.fleet)
   {
     if (i.data.location == 0) // is grounded
     {
       if (i.order.pickup_amount > 0)
       {
-        g_gameData.launches.push_back(
-          (Launch){ i, i.order, g_gameData.time, g_gameData.time + i.data.transit_time, g_gameData.time + 2 * i.data.transit_time, false, false }
-        );
-        g_gameData.current_week_data.spent += i.data.value; // ?? launch_cost
-        i.data.location = 1;
+        process_launch(i);
       }
     }
   }
-
-  //
-  // TIME-FRAME NOW ADVENCES
-  //
-  g_gameData.week_counter += 1;
-  g_gameData.time += 7.0f * (float)g_gameData.week_counter;
-
-  // Do all pickup orders in next time frame
-  for (auto& i : g_gameData.launches)
-  {
-    if (!i.picked_up && i.time_of_pickup <= g_gameData.time)
-    {
-      pickup_cargo(i.order);
-      i.picked_up = true;
-    }
-  }
-
-  // Do all cargo returns in next time frame
-  for (auto& i : g_gameData.launches)
-  {
-    if (!i.returned && i.time_of_return <= g_gameData.time)
-    {
-      return_cargo(i.order);
-      i.returned = true;
-      i.ship.data.location = 0;
-      i.ship.order = nil_order; // ?
-    }
-  }
-  g_gameData.launches.erase(std::remove_if(g_gameData.launches.begin(),
-                                  g_gameData.launches.end(),
-                                  [](std::vector<Launch>::value_type const& elem) 
-                                  {
-                                    return elem.returned;
-                                  }),
-                                  g_gameData.launches.end());
-
-  // Apply collection
-  g_gameData.current_week_data.moon_rocks_total += g_gameData.current_week_data.moon_rocks_collected;
-
-  // Process moon rocks into moon puffs
-  process_puffs();
-
-  // Sell moon puffs
-  sell_puffs();
-
-  // Apply cash
-  g_gameData.cash -= g_gameData.current_week_data.spent; 
-  g_gameData.cash += g_gameData.current_week_data.sales;
-
-  // Done
-  g_gameData.econ_history.push_back(g_gameData.current_week_data);
-  g_gameData.current_week_data = {
-    0,
-    g_gameData.current_week_data.moon_rocks_total,
-    11,
-    0,
-    0,
-    0,
-  };
 }
 
 
@@ -234,6 +171,8 @@ void drawContent(std::function<void()> f_ptr)
 
 void loop()
 {
+  g_gameData.update_timer();
+
   ImGuiIO& io = ImGui::GetIO();
 
   g_rs->start();
@@ -411,206 +350,7 @@ void loop()
   else if (g_gameData.page == Launchpad)
   {
     drawHeaderBar();
-
-    // Title
-    ImGui::PushFont(io.Fonts->Fonts[1]);
-    ImGui::Text("Launchpad");
-    ImGui::PopFont();
-
-    ImGui::SameLine();
-    if (ImGui::Button("Buy More Fleet..."))
-    {
-      g_gameData.page = PAGES::BuyFleet;
-    }
-    // Fleet list
-    //ImGui::Text("Fleet");
-      
-    ImGui::BeginChild(
-      "Fleet_container_child", 
-      ImVec2(0, 480), 
-      true, 
-      0);  
-
-    static bool toggle_button = false;
-    static Ship* which_order;
-
-    for (auto& i : g_gameData.fleet)
-    {
-      static int WINDOW_FLAGS = 0;
-      static int WINDOW_FLAGS_BORDERLESS = ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration;
-  
-      std::string title = "child_" + boost::uuids::to_string(i.tag);
-      //ImGui::SetNextWindowSize(ImVec2(g_windowManager.width, 220));
-      ImGui::BeginChild(
-        title.c_str(), 
-        ImVec2(g_windowManager.width - 20, 130), 
-        true, 
-        WINDOW_FLAGS);      
-
-      std::string title_id = "child_id_" + boost::uuids::to_string(i.tag);
-      ImGui::BeginChild(
-        title_id.c_str(), 
-        ImVec2(130, 0), 
-        true, 
-        WINDOW_FLAGS_BORDERLESS);  
-      ImGui::Text("A");
-      // ImGui::PushFont(io.Fonts->Fonts[2]);
-      // ImGui::Text("$%i", i.data.value);
-      // ImGui::PopFont();
-      
-      // Upgrades
-      ImGui::EndChild();
-      ImGui::SameLine();
-      std::string title_ups = "child_ups_" + boost::uuids::to_string(i.tag);
-      ImGui::BeginChild(
-        title_ups.c_str(), 
-        ImVec2(200, 0), 
-        true, 
-        WINDOW_FLAGS_BORDERLESS); 
-
-      ImGui::PushFont(io.Fonts->Fonts[2]);
-      ImGui::Text("Upgrades");
-
-      if (i.slot1) im_disable_buttons();
-      if (ImGui::Button("1")) 
-      {
-        g_gameData.page = UpgradeShip;
-        g_current_ship_slot = &(i.slot1);
-        g_current_ship = &i;
-      }
-      if (s_buttons_disabled) im_enable_buttons();
-      ImGui::SameLine();
-
-      if (i.slot2) im_disable_buttons();
-      if (ImGui::Button("2")) 
-      {
-        g_gameData.page = UpgradeShip;
-        g_current_ship_slot = &(i.slot2);
-        g_current_ship = &i;
-      }
-      if (s_buttons_disabled) im_enable_buttons();
-      ImGui::SameLine();
-      
-      if (i.slot3) im_disable_buttons();
-      if (ImGui::Button("3")) 
-      {
-        g_gameData.page = UpgradeShip;
-        g_current_ship_slot = &(i.slot3);
-        g_current_ship = &i;
-      }
-      if (s_buttons_disabled) im_enable_buttons();
-      ImGui::SameLine();
-      ImGui::PopFont();
-
-      ImGui::EndChild();
-      ImGui::SameLine();
-
-      std::string title_stats = "child_stats_" + boost::uuids::to_string(i.tag);
-      ImGui::BeginChild(
-        title_stats.c_str(), 
-        ImVec2(220, 0), 
-        true, 
-        WINDOW_FLAGS_BORDERLESS);      
-      ImGui::PushFont(io.Fonts->Fonts[2]);
-      // ImGui::Text("Stats");
-      // ImGui::Separator();
-      ImGui::Text("Trip time %.1f days", i.data.transit_time);
-      ImGui::Text("Trip cost $%i", i.data.value);
-      ImGui::Text("Cargo capacity %i", i.data.capacity);
-      ImGui::PopFont();
-      ImGui::EndChild();
-      ImGui::SameLine();
-
-      std::string title_status = "child_status_" + boost::uuids::to_string(i.tag);
-      ImGui::BeginChild(
-        title_status.c_str(), 
-        ImVec2(220, 0), 
-        true, 
-        WINDOW_FLAGS_BORDERLESS);   
-      if (i.data.location == 0)   
-        ImGui::Text("Ready");
-      else
-        ImGui::Text("In Transit...");
-      ImGui::EndChild();
-      ImGui::SameLine();
-
-      std::string title_order = "child_order_" + boost::uuids::to_string(i.tag);
-      ImGui::BeginChild(
-        title_order.c_str(), 
-        ImVec2(0, 0), 
-        true, 
-        WINDOW_FLAGS);   
-
-      if (i.order.pickup_amount == 0)
-      {
-        std::string title_button_order = "Order##" + boost::uuids::to_string(i.tag);
-        if (ImGui::Button(title_button_order.c_str()))
-        {
-          toggle_button = !toggle_button;
-          which_order = &i;
-        }
-      }
-      else
-      {
-        ImGui::Text("Order in place");
-        ImGui::SameLine();
-        std::string title_button_order = "Change##" + boost::uuids::to_string(i.tag);
-        if (ImGui::Button(title_button_order.c_str()))
-        {
-          toggle_button = !toggle_button;
-          which_order = &i;
-        }
-      }
-
-      ImGui::EndChild(); // order
-
-      ImGui::EndChild(); // Fleet item
-    }
-    ImGui::EndChild(); // Fleet container
-
-      if (toggle_button)
-      {
-        ImGui::OpenPopup("order");
-      }
-      else
-      {
-        ImGui::CloseCurrentPopup();
-      }
-      
-      if (ImGui::BeginPopupModal("order", &toggle_button, ImGuiWindowFlags_AlwaysAutoResize))
-      {
-        // ImGui::PushFont(io.Fonts->Fonts[1]);
-        // ImGui::Text("Order");
-        // ImGui::PopFont();
-        // ImGui::Separator();
-        
-        ImGui::Text("How much?");
-        
-        ImGui::PushFont(io.Fonts->Fonts[2]);
-        ImGui::Text("Capacity %i", which_order->data.capacity);
-        ImGui::PopFont();
-
-        if (ImGui::Button("Collect from Joe's"))
-        {
-          toggle_button = false;
-          which_order->order = (Order){ 1, which_order->data.capacity, 1 };
-        }       
-
-        if (ImGui::Button("Do nothing"))
-        {
-          toggle_button = false;
-          which_order->order = (Order){ 0, 0, 0 };
-        }        
-
-        ImGui::EndPopup();
-      }
-
-    // if (ImGui::Button("Buy More Fleet..."))
-    // {
-    //   g_gameData.page = PAGES::BuyFleet;
-    // }
-    // ImGui::SameLine();
-    //if (ImGui::Button("Back")) { g_gameData.page = Home; }
+    drawContent(&launch_page);
     drawFooterBar();
   }
 

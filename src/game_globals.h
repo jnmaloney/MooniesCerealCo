@@ -14,6 +14,7 @@
 #include "game_screens.h"
 
 
+
 void upgrade_ship(int, int);
 
 
@@ -35,6 +36,7 @@ struct Order
   int pickup_location;
   int pickup_amount;
   int cost;
+  bool repeat;
 };
 Order nil_order = (Order){ 0, 0, 0 };
 
@@ -92,7 +94,7 @@ class GameData
 {
 public:
 
-  // Resources
+ // Resources
  int                      cash;
  WeekData                 current_week_data;
  std::vector<Ship>        fleet;
@@ -102,60 +104,24 @@ public:
  std::vector<WeekData>    econ_history;
 
  // Timer
- int                      week_counter;
- float                    time;
+ int                      week_counter = 0;
+ float                    time = 0.f;
  // new
- float                    days;
+ float                    days = 0.f;
  float                    timer_speed = 1.0f;
 
  // Plots data
- std::deque<float> plot_a_x; 
- std::deque<float> plot_a_y; 
- std::deque<float> plot_b_x; 
- std::deque<float> plot_b_y; 
+ std::vector<float> plot_a_x; 
+ std::vector<float> plot_a_y; 
+ std::vector<float> plot_b_x; 
+ std::vector<float> plot_b_y; 
+ int plot_data_cursor = 0;
 
  // Navigation
  PAGES                    page;
 
-  void day_snapshot()
-  {
-    float value_a_x = ; // income
-    float value_a_y = ; // day
-    float value_b_x = ; // product
-    float value_b_y = ; // day
-
-    plot_a_x.push_back(value_a_x);
-    if (plot_a_x.size() > 6 * 7) plot_a_x.pop_front();
-    plot_a_y.push_back(value_a_y);
-    if (plot_a_y.size() > 6 * 7) plot_a_y.pop_front();
-    plot_b_x.push_back(value_b_x);
-    if (plot_b_x.size() > 6 * 7) plot_b_x.pop_front();
-    plot_b_y.push_back(value_b_y);
-    if (plot_b_y.size() > 6 * 7) plot_b_y.pop_front();
-  }
-
-  void update_timer()
-  {
-    static float next_day_counter = 1.0f;
-
-    days += timer_speed * (1.0/30.);
-    if (days >= 7.0f)
-    {
-      day_snapshot();
-
-      days = 0;
-      week_counter += 1;
-      //end_week(); //a c t i o n
-
-      next_day_counter = 1.0f;
-    }
-    else if (days > next_day_counter)
-    {
-      day_snapshot();
-      next_day_counter += 1.0f;
-      //day_event();
-    }
-  }
+  void day_snapshot();
+  void update_timer();
 
 };
 extern GameData g_gameData;

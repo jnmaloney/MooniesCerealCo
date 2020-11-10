@@ -81,6 +81,9 @@ void drawFooterBar()
   ImGui::SetCursorPosY(0);
   ImGui::Text("Week %i", g_gameData.week_counter + 1);
 
+  ImGui::SetCursorPosX(g_windowManager.width - 150);
+  ImGui::ProgressBar(g_gameData.days / 7.0f, ImVec2(-1, 0), "");
+
   ImGui::EndChild();
 }
 
@@ -102,23 +105,6 @@ void drawBackBar(PAGES page)
 
 void econ_page()
 {  
-  // ImGui::Text("moon_rocks_collected"); ImGui::SameLine();
-  // ImGui::Text("moon_rocks_total"); ImGui::SameLine();
-  // //ImGui::Text(""); ImGui::SameLine();
-  // ImGui::Text("processing_rate"); ImGui::SameLine();
-  // ImGui::Text("spent"); ImGui::SameLine();
-  // ImGui::Text("sales");
-
-  // for (auto i : g_gameData.econ_history)
-  // {
-  //   ImGui::Text("%i", i.moon_rocks_collected); ImGui::SameLine();
-  //   ImGui::Text("%i", i.moon_rocks_total); ImGui::SameLine();
-  //   //ImGui::Text("%i", i.); ImGui::SameLine();
-  //   ImGui::Text("%i", i.processing_rate); ImGui::SameLine();
-  //   ImGui::Text("$%i", i.spent); ImGui::SameLine();
-  //   ImGui::Text("$%i", i.sales);
-  // }
-
   ImGui::SetCursorPosY(0);
   ImGui::TextUnformatted("moon rocks collected");
       ImGui::Text("");
@@ -137,7 +123,6 @@ void econ_page()
   float cash[4];
   float stock[4];
   for (int i = 0; i < 4; ++i)
-  //for (int i = 4 - 1; i >= 0; --i)
   {
     ImGui::SetCursorPosY(16);
     if (i < g_gameData.econ_history.size())
@@ -175,16 +160,117 @@ void econ_page()
 
   ImGui::SetCursorPosX(750);
   ImGui::SetCursorPosY(8);
-  ImGui::PlotLines("##Income", cash, IM_ARRAYSIZE(cash), 0, "Income", -1.0f, 1.0f, ImVec2(340, 280.0f));
+  // ImGui::PlotLines("##Income", cash, IM_ARRAYSIZE(cash), 0, "Income", -1.0f, 1.0f, ImVec2(340, 280.0f));
+  if (g_gameData.plot_a_x.size())
+  {
+    ImGuiIO& io = ImGui::GetIO();
+
+    {
+      const auto& v = g_gameData.plot_a_x;
+      const auto [min, max] = std::minmax_element(begin(v), end(v));
+
+      ImGui::PushFont(io.Fonts->Fonts[2]);
+      if (g_gameData.plot_data_cursor < g_gameData.plot_a_x.size())
+      {
+        ImPlot::SetNextPlotLimits(
+          g_gameData.plot_a_y[g_gameData.plot_data_cursor] - 6, 
+          g_gameData.plot_a_y[g_gameData.plot_data_cursor], 
+          *min - 1000, 
+          *max + 1000, 
+          ImGuiCond_Always);
+      }
+      else
+      {
+        ImPlot::SetNextPlotLimits(
+          g_gameData.plot_a_y[g_gameData.plot_data_cursor - 1] - 6, 
+          g_gameData.plot_a_y[g_gameData.plot_data_cursor - 1], 
+          *min - 1000, 
+          *max + 1000, 
+          ImGuiCond_Always);
+      }
+      ImPlot::BeginPlot(
+        "Income##IncomePlot", 
+        "week", 
+        "",
+        ImVec2(-1, 0),
+        ImPlotFlags_None,
+        ImPlotAxisFlags_Lock,
+        ImPlotAxisFlags_NoGridLines
+        );    
+      ImPlot::PlotLine("##Income", 
+        g_gameData.plot_a_y.data(), 
+        g_gameData.plot_a_x.data(), 
+        g_gameData.plot_a_x.size(),
+        g_gameData.plot_data_cursor + 1);
+      ImPlot::PlotScatter("##Income", 
+        g_gameData.plot_a_y.data(), 
+        g_gameData.plot_a_x.data(), 
+        g_gameData.plot_a_x.size(),
+        g_gameData.plot_data_cursor);
+      ImPlot::EndPlot();
+      ImGui::PopFont();
+    }
+  }
       
   ImGui::SetCursorPosX(750);
   ImGui::SetCursorPosY((g_windowManager.height - 2 * 84) / 2);     
-  ImGui::PlotLines("##Stock", stock, IM_ARRAYSIZE(stock), 0, "Stock", -1.0f, 1.0f, ImVec2(340, 280.0f));
+
+  if (g_gameData.plot_b_x.size())
+  {
+    ImGuiIO& io = ImGui::GetIO();
+    {
+      const auto& v = g_gameData.plot_b_x;
+      const auto [min, max] = std::minmax_element(begin(v), end(v));
+
+      ImGui::PushFont(io.Fonts->Fonts[2]);
+      if (g_gameData.plot_data_cursor < g_gameData.plot_b_x.size())
+      {
+        ImPlot::SetNextPlotLimits(
+          g_gameData.plot_b_y[g_gameData.plot_data_cursor] - 6, 
+          g_gameData.plot_b_y[g_gameData.plot_data_cursor], 
+          *min - 1, 
+          *max + 1, 
+          ImGuiCond_Always);
+      }
+      else
+      {
+        ImPlot::SetNextPlotLimits(
+          g_gameData.plot_b_y[g_gameData.plot_data_cursor - 1] - 6, 
+          g_gameData.plot_b_y[g_gameData.plot_data_cursor - 1], 
+          *min - 1, 
+          *max + 1, 
+          ImGuiCond_Always);
+      }
+      ImPlot::BeginPlot(
+        "Moon Rock##ProductPlot", 
+        "week", 
+        "",
+        ImVec2(-1, 0),
+        ImPlotFlags_None,
+        ImPlotAxisFlags_Lock,
+        ImPlotAxisFlags_NoGridLines
+        );    
+      ImPlot::PlotLine("##Income", 
+        g_gameData.plot_b_y.data(), 
+        g_gameData.plot_b_x.data(), 
+        g_gameData.plot_b_x.size(),
+        g_gameData.plot_data_cursor + 1);
+      ImPlot::PlotScatter("##Income", 
+        g_gameData.plot_b_y.data(), 
+        g_gameData.plot_b_x.data(), 
+        g_gameData.plot_b_x.size(),
+        g_gameData.plot_data_cursor);
+      ImPlot::EndPlot();
+      ImGui::PopFont();
+    }
+  }
 }
 
 
 void upgrade_ship_page()
 {
+  ImGuiIO& io = ImGui::GetIO();
+  
   int updrade_x = 220;
   int upgrade_y = 450;
   ImGui::BeginChild(
@@ -268,4 +354,226 @@ void upgrade_ship_page()
   ImGui::Text("repairs.");
   ImGui::Text("$4 000");
   ImGui::EndChild();
+}
+
+
+void launch_page()
+{
+  ImGuiIO& io = ImGui::GetIO();
+  
+  // Title
+  ImGui::PushFont(io.Fonts->Fonts[1]);
+  ImGui::Text("Launchpad");
+  ImGui::PopFont();
+
+  ImGui::SameLine();
+  if (ImGui::Button("Buy More Fleet..."))
+  {
+    g_gameData.page = PAGES::BuyFleet;
+  }
+  // Fleet list
+  //ImGui::Text("Fleet");
+    
+  ImGui::BeginChild(
+    "Fleet_container_child", 
+    ImVec2(0, 480), 
+    true, 
+    0);  
+
+  static bool toggle_button = false;
+  static Ship* which_order;
+
+  for (auto& i : g_gameData.fleet)
+  {
+    static int WINDOW_FLAGS = 0;
+    static int WINDOW_FLAGS_BORDERLESS = ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration;
+
+    std::string title = "child_" + boost::uuids::to_string(i.tag);
+    //ImGui::SetNextWindowSize(ImVec2(g_windowManager.width, 220));
+    ImGui::BeginChild(
+      title.c_str(), 
+      ImVec2(g_windowManager.width - 20, 130), 
+      true, 
+      WINDOW_FLAGS);      
+
+    std::string title_id = "child_id_" + boost::uuids::to_string(i.tag);
+    ImGui::BeginChild(
+      title_id.c_str(), 
+      ImVec2(130, 0), 
+      true, 
+      WINDOW_FLAGS_BORDERLESS);  
+    ImGui::Text("A");
+    // ImGui::PushFont(io.Fonts->Fonts[2]);
+    // ImGui::Text("$%i", i.data.value);
+    // ImGui::PopFont();
+    
+    // Upgrades
+    ImGui::EndChild();
+    ImGui::SameLine();
+    std::string title_ups = "child_ups_" + boost::uuids::to_string(i.tag);
+    ImGui::BeginChild(
+      title_ups.c_str(), 
+      ImVec2(200, 0), 
+      true, 
+      WINDOW_FLAGS_BORDERLESS); 
+
+    ImGui::PushFont(io.Fonts->Fonts[2]);
+    ImGui::Text("Upgrades");
+
+    if (i.slot1) im_disable_buttons();
+    if (ImGui::Button("1")) 
+    {
+      g_gameData.page = UpgradeShip;
+      // g_current_ship_slot = &(i.slot1);
+      // g_current_ship = &i;
+    }
+    if (im_is_button_disabled()) im_enable_buttons();
+    ImGui::SameLine();
+
+    if (i.slot2) im_disable_buttons();
+    if (ImGui::Button("2")) 
+    {
+      g_gameData.page = UpgradeShip;
+      // g_current_ship_slot = &(i.slot2);
+      // g_current_ship = &i;
+    }
+    if (im_is_button_disabled()) im_enable_buttons();
+    ImGui::SameLine();
+    
+    if (i.slot3) im_disable_buttons();
+    if (ImGui::Button("3")) 
+    {
+      g_gameData.page = UpgradeShip;
+      // g_current_ship_slot = &(i.slot3);
+      // g_current_ship = &i;
+    }
+    if (im_is_button_disabled()) im_enable_buttons();
+    ImGui::SameLine();
+    ImGui::PopFont();
+
+    ImGui::EndChild();
+    ImGui::SameLine();
+
+    std::string title_stats = "child_stats_" + boost::uuids::to_string(i.tag);
+    ImGui::BeginChild(
+      title_stats.c_str(), 
+      ImVec2(220, 0), 
+      true, 
+      WINDOW_FLAGS_BORDERLESS);      
+    ImGui::PushFont(io.Fonts->Fonts[2]);
+    // ImGui::Text("Stats");
+    // ImGui::Separator();
+    ImGui::Text("Trip time %.1f days", i.data.transit_time);
+    ImGui::Text("Trip cost $%i", i.data.value);
+    ImGui::Text("Cargo capacity %i", i.data.capacity);
+    ImGui::PopFont();
+    ImGui::EndChild();
+    ImGui::SameLine();
+
+    std::string title_status = "child_status_" + boost::uuids::to_string(i.tag);
+    ImGui::BeginChild(
+      title_status.c_str(), 
+      ImVec2(220, 0), 
+      true, 
+      WINDOW_FLAGS_BORDERLESS);   
+    // if (i.data.location == 0)   
+    //   ImGui::Text("Ready");
+    // else
+    //   ImGui::Text("In Transit...");
+    if (i.data.location == 0)   
+      ImGui::Text("Ready");
+    else if (i.data.location == 1)   
+      ImGui::Text("Going up");
+    else if (i.data.location == 2)
+      ImGui::Text("Return");
+    else
+      ImGui::Text("Something...");      
+    ImGui::EndChild();
+    ImGui::SameLine();
+
+    std::string title_order = "child_order_" + boost::uuids::to_string(i.tag);
+    ImGui::BeginChild(
+      title_order.c_str(), 
+      ImVec2(0, 0), 
+      true, 
+      WINDOW_FLAGS);   
+
+    if (i.order.pickup_amount == 0)
+    {
+      std::string title_button_order = "Order##" + boost::uuids::to_string(i.tag);
+      if (ImGui::Button(title_button_order.c_str()))
+      {
+        toggle_button = !toggle_button;
+        which_order = &i;
+      }
+    }
+    else
+    {
+      // ImGui::Text("Order in place");
+      // ImGui::SameLine();
+      std::string title_button_order = "Change##" + boost::uuids::to_string(i.tag);
+      if (ImGui::Button(title_button_order.c_str()))
+      {
+        toggle_button = !toggle_button;
+        which_order = &i;
+      }
+    }
+    ImGui::SameLine();
+    if (ImGui::Checkbox("Repeat", &i.order.repeat))
+    {
+
+    }
+
+    if (i.order.pickup_amount > 0)
+    {
+      ImGui::Text("Order placed");
+    }
+
+    ImGui::EndChild(); // order
+
+    ImGui::EndChild(); // Fleet item
+  }
+  ImGui::EndChild(); // Fleet container
+
+  // Popups
+    if (toggle_button)
+    {
+      ImGui::OpenPopup("order");
+    }
+    else
+    {
+      ImGui::CloseCurrentPopup();
+    }
+    
+    if (ImGui::BeginPopupModal("order", &toggle_button, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+      // ImGui::PushFont(io.Fonts->Fonts[1]);
+      // ImGui::Text("Order");
+      // ImGui::PopFont();
+      // ImGui::Separator();
+      
+      ImGui::Text("How much?");
+      
+      ImGui::PushFont(io.Fonts->Fonts[2]);
+      ImGui::Text("Capacity %i", which_order->data.capacity);
+      ImGui::PopFont();
+
+      static bool s_repeat = false;
+      ImGui::Checkbox("Repeat", &s_repeat);
+
+      if (ImGui::Button("Collect from Joe's"))
+      {
+        toggle_button = false;
+        which_order->order = (Order){ 1, which_order->data.capacity, 1, s_repeat };
+      }       
+
+      if (ImGui::Button("Do nothing"))
+      {
+        toggle_button = false;
+        which_order->order = (Order){ 0, 0, 0 };
+      }        
+
+      ImGui::EndPopup();
+    }
+
 }

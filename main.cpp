@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "imgui.h"
+#include "implot.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #ifdef __EMSCRIPTEN__
@@ -49,10 +50,10 @@ int main(int argc, char** argv)
   style.FramePadding.x = 20;
   style.FramePadding.y = 8;
 
+  style.WindowRounding = 0.0f;
   style.FrameBorderSize = 6.0f;
   style.FrameRounding = 12.0f;
 
-  //style.Colors[ImGuiCol_WindowBg] = ImColor(0x01, 0x10, 0x14, 0xff); // Rich black FOGRA
   style.Colors[ImGuiCol_WindowBg] = ImColor(52, 101, 164, 0xff);
   style.Colors[ImGuiCol_Text] = ImColor(g_palette["indigo_200"]);
   style.Colors[ImGuiCol_Button] = ImColor(g_palette["indigo_600"]);
@@ -61,12 +62,14 @@ int main(int argc, char** argv)
   style.Colors[ImGuiCol_Border] = ImColor(g_palette["indigo_800"]);
   
   style.Colors[ImGuiCol_PlotLines] = ImColor(g_palette["indigo_200"]);
-  
-  // style.Colors[ImGuiCol_Button] = ImColor(0x04, 0x3E, 0x4E, 0xff); // Midnight Green Eagle Green
-  // style.Colors[ImGuiCol_ButtonHovered] = ImColor(0x07, 0x6C, 0x88,  0xff); // Blue Sapphire
-  // style.Colors[ImGuiCol_ButtonActive] = ImColor(0x0A, 0x9A, 0xC2, 0xff); // Blue Green
 
-  // Initialiser
+  // ImPlot
+  ImPlot::CreateContext();
+  ImPlot::GetStyle().LineWeight = 8.0f;
+  ImPlot::GetStyle().AntiAliasedLines = true;
+  ImPlot::GetStyle().Colors[ImPlotCol_Line] = ImColor(g_palette["indigo_200"]);
+  
+  // Initialiser (game)
   g_gameData.fleet.push_back(Ship((ShipData){ 3.4f, 2000, 18000, 0 }));
 
   #ifdef __EMSCRIPTEN__

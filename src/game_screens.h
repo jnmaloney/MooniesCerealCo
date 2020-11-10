@@ -20,3 +20,4 @@ void drawBackBar(PAGES page);
 
 void econ_page();
 void upgrade_ship_page();
+void launch_page();
