@@ -5,6 +5,26 @@
 #include "implot.h"
 #include "palette.h"
 #include "launch_scene.h"
+#include "dialog_manager.h"
+
+
+static DialogManager s_dialogManager;
+
+
+void draw_dialog()
+{
+  static bool inited = false;
+  if (!inited) 
+  {
+    s_dialogManager.init();
+    Dialog d;
+    d.load("/data/intro.dialog");
+    s_dialogManager.dialog = d;
+    inited = true;
+  }
+
+  s_dialogManager.draw();
+}
 
 
 void drawHeaderBar()
@@ -83,7 +103,7 @@ void drawFooterBar()
   ImGui::Text("Week %i", g_gameData.week_counter + 1);
 
   ImGui::SetCursorPosX(g_windowManager.width - 150);
-  ImGui::ProgressBar(g_gameData.days / 7.0f, ImVec2(-1, 0), "");
+  ImGui::ProgressBar(g_gameData.days / 7.0f, ImVec2(-1, 26), "");
 
   ImGui::EndChild();
 }

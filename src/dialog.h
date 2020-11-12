@@ -23,4 +23,6 @@ public:
 
   void load(const char* filename);
 
+  void next();
+
 };

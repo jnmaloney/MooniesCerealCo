@@ -20,5 +20,15 @@ public:
   std::map<std::string, Character> characters;
 
   void init();
-  
+
+  void draw();
+
+  Dialog dialog;  
+
+  struct Transition
+  {
+    int in_out;
+    float t;
+  };
+  Transition transition;
 };

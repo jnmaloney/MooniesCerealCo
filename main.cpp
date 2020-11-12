@@ -65,6 +65,7 @@ int main(int argc, char** argv)
   style.Colors[ImGuiCol_Border] = ImColor(g_palette["indigo_800"]);
   
   style.Colors[ImGuiCol_PlotLines] = ImColor(g_palette["indigo_200"]);
+  style.Colors[ImGuiCol_PlotHistogram] = ImColor(g_palette["grey_400"]);
 
   // ImPlot
   ImPlot::CreateContext();
