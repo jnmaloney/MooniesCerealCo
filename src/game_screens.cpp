@@ -4,13 +4,14 @@
 #include "imgui_internal.h" //itemflags
 #include "implot.h"
 #include "palette.h"
+#include "launch_scene.h"
 
 
 void drawHeaderBar()
 {
   ImGui::GetWindowDrawList()->AddRectFilled(
     ImVec2(0, 0), 
-    ImVec2(g_windowManager.width, 62), 
+    ImVec2(g_windowManager.width, 63), 
     IM_COL32(0x43, 0x47, 0xA0, 255),//g_palette["indigo_600"], 
     0.0f,
     ImDrawCornerFlags_None);
@@ -359,6 +360,8 @@ void upgrade_ship_page()
 
 void launch_page()
 {
+  //draw_launch_scene(g_rs);
+  
   ImGuiIO& io = ImGui::GetIO();
   
   // Title
@@ -392,7 +395,7 @@ void launch_page()
     //ImGui::SetNextWindowSize(ImVec2(g_windowManager.width, 220));
     ImGui::BeginChild(
       title.c_str(), 
-      ImVec2(g_windowManager.width - 20, 130), 
+      ImVec2(g_windowManager.width - 20, 78), 
       true, 
       WINDOW_FLAGS);      
 
@@ -496,7 +499,7 @@ void launch_page()
       title_order.c_str(), 
       ImVec2(0, 0), 
       true, 
-      WINDOW_FLAGS);   
+      WINDOW_FLAGS_BORDERLESS);   
 
     if (i.order.pickup_amount == 0)
     {

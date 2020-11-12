@@ -124,7 +124,7 @@ public:
   void update_timer();
 
 };
-extern GameData g_gameData;
+extern GameData& g_gameData;
 
 // std::vector<WeekData>&    g_econ_history          = SecretFunctions::get_econ_history();
 // WeekData&                 g_current_week_data     = SecretFunctions::get_current_week_data();

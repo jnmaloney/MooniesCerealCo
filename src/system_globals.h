@@ -19,8 +19,7 @@ WindowManager& g_windowManager = gs_windowManager();
 MenuManager& g_menuManager = gs_menuManager();
 
 glm::mat4 cameraView, cameraProjection, identityMatrix, objectMatrix;
-int gizmoCount = 1;
-float camDistance = 12.0;
+float camDistance = 18.0;
 }
 
 void im_disable_buttons();

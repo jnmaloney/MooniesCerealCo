@@ -2,7 +2,9 @@
 #include "actions.h"
 
 
-GameData g_gameData;
+// extern global instance
+static GameData hidden_gamedata;
+GameData& g_gameData = hidden_gamedata;
 
 // struct GameInstance
 // {

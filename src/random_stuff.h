@@ -16,6 +16,8 @@
 #include "game_screens.h"
 #include "actions.h"
 
+#include "launch_scene.h"
+
 
 int fulfil(int location, int amount)
 {
@@ -176,6 +178,12 @@ void loop()
   ImGuiIO& io = ImGui::GetIO();
 
   g_rs->start();
+  
+  if (g_gameData.page == Launchpad)
+  {
+    draw_launch_scene(g_rs);
+  }
+
   g_menuManager.predraw();
 
   // ImGuizmo::DrawGrid(glm::value_ptr( cameraView ), glm::value_ptr(  cameraProjection ), glm::value_ptr(  identityMatrix ), 100.f);
@@ -387,4 +395,6 @@ void loop()
   // ImGuizmo::ViewManipulate(glm::value_ptr( cameraView ), camDistance, ImVec2(io.DisplaySize.x - 128, 0), ImVec2(128, 128), 0x10101010);
 
   g_menuManager.postdraw();
+
+  g_rs->end();
 };

@@ -22,14 +22,16 @@ int main(int argc, char** argv)
 
   g_rs = new RenderSystem();
   g_rs->init();
+  g_rs->setClearColour(52, 101, 164);
 
-  glm::vec3 eye = camDistance * glm::vec3(0, 0, 1);
-  glm::vec3 centre(0, 0, 0);
-  glm::vec3 up(0, 1, 0);
+  glm::vec3 eye = camDistance * glm::vec3(1, 1, 0.45);
+  glm::vec3 centre(0, 0, 0.9);
+  glm::vec3 up(0, 0, 1);
   cameraView = glm::lookAt(eye, centre, up);
   cameraProjection = glm::perspective(45.0f, (float)g_windowManager.width / (float)g_windowManager.height, 1.0f, 200.0f);
   identityMatrix = glm::mat4(1.0);
   objectMatrix = glm::mat4(1.0);
+  g_rs->setViewProj(cameraProjection * cameraView);
 
   // Palette
   load_palette("/data/material_palette.csv");
@@ -54,7 +56,8 @@ int main(int argc, char** argv)
   style.FrameBorderSize = 6.0f;
   style.FrameRounding = 12.0f;
 
-  style.Colors[ImGuiCol_WindowBg] = ImColor(52, 101, 164, 0xff);
+  //style.Colors[ImGuiCol_WindowBg] = ImColor(52, 101, 164, 0xff);
+  style.Colors[ImGuiCol_WindowBg] = ImColor(0, 0, 0, 0);
   style.Colors[ImGuiCol_Text] = ImColor(g_palette["indigo_200"]);
   style.Colors[ImGuiCol_Button] = ImColor(g_palette["indigo_600"]);
   style.Colors[ImGuiCol_ButtonHovered] = ImColor(g_palette["indigo_400"]);
