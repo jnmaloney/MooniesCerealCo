@@ -118,7 +118,7 @@ public:
  int plot_data_cursor = 0;
 
  // Navigation
- PAGES                    page;
+ PAGES                    page = MainMenu;
 
   void day_snapshot();
   void update_timer();

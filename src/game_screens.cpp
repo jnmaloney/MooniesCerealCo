@@ -11,9 +11,9 @@
 static DialogManager s_dialogManager;
 
 
+  static bool inited = false;
 void draw_dialog()
 {
-  static bool inited = false;
   if (!inited) 
   {
     s_dialogManager.init();
@@ -599,4 +599,25 @@ void launch_page()
       ImGui::EndPopup();
     }
 
+}
+
+void draw_mainmenu()
+{
+  ImGui::Text("Moonies Cereal Co (Week 2 build)");
+
+  //ImGui::Begin("MainMenu");
+  if (ImGui::Button("New Game"))
+  {    
+    g_gameData.page = Home;
+  }
+
+  ImGui::Separator();
+
+  if (ImGui::Button("Free Play"))
+  {
+    //s_dialogManager.dialog.talkEvents.clear();
+    inited = true;
+    g_gameData.page = Home;
+  }
+  //ImGui::End();
 }

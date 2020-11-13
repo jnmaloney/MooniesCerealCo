@@ -17,6 +17,7 @@
 #include "actions.h"
 
 #include "launch_scene.h"
+#include "processing_scene.h"
 
 
 int fulfil(int location, int amount)
@@ -179,14 +180,17 @@ void loop()
 
   g_rs->start();
   
-  if (g_gameData.page == Launchpad)
+if (g_gameData.page == Launchpad)
   {
     draw_launch_scene(g_rs);
   }
+  else if (g_gameData.page == Processing)
+  {
+    draw_processing_scene(g_rs);
+  }
 
   g_menuManager.predraw();
-  
-  draw_dialog();  
+
 
   // ImGuizmo::DrawGrid(glm::value_ptr( cameraView ), glm::value_ptr(  cameraProjection ), glm::value_ptr(  identityMatrix ), 100.f);
   // ImGuizmo::DrawCubes(glm::value_ptr( cameraView ), glm::value_ptr(  cameraProjection ), glm::value_ptr( objectMatrix ), gizmoCount);
@@ -211,7 +215,11 @@ void loop()
 	ImGui::Begin("Editor", &open, FULL_SCREEN_FLAGS);
   ImGui::PopStyleVar();
 
-  if (g_gameData.page == Home)
+  if (g_gameData.page == MainMenu)
+  {
+    draw_mainmenu();
+  }
+  else if (g_gameData.page == Home)
   {
     drawHeaderBar();
     
@@ -391,6 +399,13 @@ void loop()
   }
 
 
+  // Character dialog
+  if (g_gameData.page != MainMenu)  
+  {
+    draw_dialog();  
+  }
+
+  
   ImGui::End();
 
   // ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);

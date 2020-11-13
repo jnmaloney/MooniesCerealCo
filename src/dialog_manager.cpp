@@ -22,16 +22,18 @@ void DialogManager::draw()
                           ImGuiWindowFlags_NoBringToFrontOnFocus |
                           ImGuiWindowFlags_NoSavedSettings;
                           
-  ImGui::SetNextWindowSize(ImVec2(g_windowManager.width, g_windowManager.height));
-  ImGui::SetNextWindowPos(ImVec2(0, 0));
+  // ImGui::SetNextWindowSize(ImVec2(g_windowManager.width, g_windowManager.height));
+  // ImGui::SetNextWindowPos(ImVec2(0, 0));
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
   bool open = true;
-	ImGui::Begin("Dialog", &open, FULL_SCREEN_FLAGS);
+	//ImGui::Begin("Dialog", &open, FULL_SCREEN_FLAGS);
+  ImGui::SetCursorPos(ImVec2(0, 0));
+  ImGui::BeginChild("Dialog", ImVec2(g_windowManager.width, g_windowManager.height), false, FULL_SCREEN_FLAGS);
 
   // Darken screen
   //const ImU32 dim_bg_col = GetColorU32(dim_bg_for_modal ? ImGuiCol_ModalWindowDimBg : ImGuiCol_NavWindowingDimBg, g.DimBgRatio);
-  //const ImU32 dim_bg_col = ImColor(1.f, 1.f, 1.f, 0.25f);
-  const ImU32 dim_bg_col = ImColor(1.f, 1.f, 1.f, 0.75f);
+  const ImU32 dim_bg_col = ImColor(1.f, 1.f, 1.f, 0.25f);
+  //const ImU32 dim_bg_col = ImColor(1.f, 1.f, 1.f, 0.75f);
   ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(0, 0), ImVec2(g_windowManager.width, g_windowManager.height), dim_bg_col);
 
   // Character sprite
@@ -66,5 +68,5 @@ void DialogManager::draw()
 
   // End window
   ImGui::PopStyleVar();
-  ImGui::End();
+  ImGui::EndChild();
 }

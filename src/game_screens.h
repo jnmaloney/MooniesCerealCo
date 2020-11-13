@@ -3,7 +3,8 @@
 
 enum PAGES
 {
-  Home = 0,
+  MainMenu = 0,
+  Home,
   Launchpad,
   Mining,
   Econ,
@@ -23,3 +24,5 @@ void upgrade_ship_page();
 void launch_page();
 
 void draw_dialog();
+
+void draw_mainmenu();
