@@ -5,9 +5,6 @@
 
 void DialogManager::init()
 {
-  characters["Moonie"].texture.loadPng("/data/characters/moonie overlay.png");
-  characters["Girl"].texture.loadPng("/data/characters/outline_girl.png");
-  characters["Bot"].texture.loadPng("/data/characters/outline_bot.png");
 }
 
 
@@ -37,7 +34,9 @@ void DialogManager::draw()
   ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(0, 0), ImVec2(g_windowManager.width, g_windowManager.height), dim_bg_col);
 
   // Character sprite
-  int id = characters[dialog.talkEvents.front().name].texture.getID();
+  const char* resource_name = dialog.talkEvents.front().name.c_str();
+  unsigned int id = 0;
+  g_rm.getResource(resource_name, id);
   ImVec2 min(0, 0);
   ImVec2 max(g_windowManager.width, g_windowManager.height);
   ImGui::GetWindowDrawList()->AddImage((ImTextureID)id, min, max);

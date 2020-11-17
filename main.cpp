@@ -8,6 +8,7 @@
 #include <emscripten/html5.h>
 #endif
 #include "random_stuff.h"
+#include "system_globals.h"
 #include "game_globals.h"
 #include "palette.h"
 
@@ -73,6 +74,35 @@ int main(int argc, char** argv)
   ImPlot::GetStyle().AntiAliasedLines = true;
   ImPlot::GetStyle().Colors[ImPlotCol_Line] = ImColor(g_palette["indigo_200"]);
   
+  // Resources (async loading)
+
+  // UI
+  g_rm.addResource("ui_title", "resources/ui_elemnt_1.png", ResourceManager::PNG);
+
+  // - Portraits - 
+  g_rm.addResource("Girl(angr_alt)", "resources/portrait/girl/angr_alt.png", ResourceManager::PNG);
+  g_rm.addResource("Girl(angr_smile)", "resources/portrait/girl/angr_smile.png", ResourceManager::PNG);
+  g_rm.addResource("Girl(neutral)", "resources/portrait/girl/neutral.png", ResourceManager::PNG);
+  g_rm.addResource("Girl(smiler)", "resources/portrait/girl/smiler.png", ResourceManager::PNG);
+  g_rm.addResource("Moonie(neutral)", "resources/portrait/moonie/neutral.png", ResourceManager::PNG);
+  g_rm.addResource("Moonie(smiler)", "resources/portrait/moonie/smiler.png", ResourceManager::PNG);
+  g_rm.addResource("Bot(ex)", "resources/portrait/bot/exclamation_mark.png", ResourceManager::PNG);
+  g_rm.addResource("Bot(neutral)", "resources/portrait/bot/neutral.png", ResourceManager::PNG);
+  g_rm.addResource("Bot(qu)", "resources/portrait/bot/question_mark.png", ResourceManager::PNG);
+  g_rm.addResource("Bot(smile)", "resources/portrait/bot/smile_emote.png", ResourceManager::PNG);
+  g_rm.addResource("Bot(zzz)", "resources/portrait/bot/zzz.png", ResourceManager::PNG);
+
+  // - 3D's -
+  g_rm.addResource("conveyor body", "resources/objects/conveyor/conveyor bake.obj", ResourceManager::OBJ);
+  g_rm.addResource("conveyor belt", "resources/objects/conveyor/conveyor belt isolated.obj", ResourceManager::OBJ);
+  g_rm.addResource("conveyor body(tex)", "resources/objects/conveyor/ao_target.png", ResourceManager::PNG);
+  g_rm.addResource("conveyor belt(tex)", "resources/objects/conveyor/conveyor_tile.obj", ResourceManager::PNG);
+
+  // - Audio - 
+
+  // Start the async load
+  g_rm.start_async_load();
+
   // Initialiser (game)
   g_gameData.fleet.push_back(Ship((ShipData){ 3.4f, 2000, 18000, 0 }));
 
