@@ -79,13 +79,18 @@ int main(int argc, char** argv)
   // UI
   g_rm.addResource("ui_title", "resources/ui_elemnt_1.png", ResourceManager::PNG);
 
+  // Misc
+  g_rm.addResource("square", "resources/square.obj", ResourceManager::OBJ);
+
   // - Portraits - 
   g_rm.addResource("Girl(angr_alt)", "resources/portrait/girl/angr_alt.png", ResourceManager::PNG);
   g_rm.addResource("Girl(angr_smile)", "resources/portrait/girl/angr_smile.png", ResourceManager::PNG);
   g_rm.addResource("Girl(neutral)", "resources/portrait/girl/neutral.png", ResourceManager::PNG);
   g_rm.addResource("Girl(smiler)", "resources/portrait/girl/smiler.png", ResourceManager::PNG);
+ 
   g_rm.addResource("Moonie(neutral)", "resources/portrait/moonie/neutral.png", ResourceManager::PNG);
   g_rm.addResource("Moonie(smiler)", "resources/portrait/moonie/smiler.png", ResourceManager::PNG);
+ 
   g_rm.addResource("Bot(ex)", "resources/portrait/bot/exclamation_mark.png", ResourceManager::PNG);
   g_rm.addResource("Bot(neutral)", "resources/portrait/bot/neutral.png", ResourceManager::PNG);
   g_rm.addResource("Bot(qu)", "resources/portrait/bot/question_mark.png", ResourceManager::PNG);
@@ -96,7 +101,22 @@ int main(int argc, char** argv)
   g_rm.addResource("conveyor body", "resources/objects/conveyor/conveyor bake.obj", ResourceManager::OBJ);
   g_rm.addResource("conveyor belt", "resources/objects/conveyor/conveyor belt isolated.obj", ResourceManager::OBJ);
   g_rm.addResource("conveyor body(tex)", "resources/objects/conveyor/ao_target.png", ResourceManager::PNG);
-  g_rm.addResource("conveyor belt(tex)", "resources/objects/conveyor/conveyor_tile.obj", ResourceManager::PNG);
+  g_rm.addResource("conveyor belt(tex)", "resources/objects/conveyor/conveyor_tile.png", ResourceManager::PNG);
+
+  g_rm.addResource("rocket", "resources/objects/rocket/retro toy rocket.obj", ResourceManager::OBJ);
+  g_rm.addResource("launch platform", "resources/objects/rocket/launch_platform.obj", ResourceManager::OBJ);
+  g_rm.addResource("mtl1", "resources/objects/rocket/mtl1.png", ResourceManager::PNG);
+  g_rm.addResource("mtl3", "resources/objects/rocket/mtl3.png", ResourceManager::PNG);
+  g_rm.addResource("mtl4", "resources/objects/rocket/mtl4.png", ResourceManager::PNG);
+  g_rm.addResource("launch_texture", "resources/objects/rocket/launch_texture.png", ResourceManager::PNG);
+
+  // Particles
+  for (int i = 0; i < 25; ++i)
+  {
+    std::string filename = (std::string("resources/objects/White puff/whitePuff") + ZeroPadNumber(i) + std::string(".png"));
+    std::string resource = (std::string("whitePuff") + ZeroPadNumber(i));
+    g_rm.addResource(resource.c_str(), filename.c_str(), ResourceManager::PNG);
+  }
 
   // - Audio - 
 

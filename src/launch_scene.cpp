@@ -1,11 +1,7 @@
 #include "launch_scene.h"
 #include "RenderSystem.h"
 #include "Mesh.h"
-#include "Mesh_obj.h"
-#include "Texture.h"
 #include "system_globals.h"
-#include <sstream>
-#include <iomanip>
 #include "Random.h"
 #include "game_globals.h"
 
@@ -18,12 +14,12 @@ public:
 
 protected:
   bool is_init = false;
-  Mesh_obj rocket_mesh;
-  Mesh_obj platform_mesh;
-  Mesh_obj square_mesh;
-  Texture platform_texture;
-  Texture rocket_texture[3];
-  Texture puff_texture[25];
+  Mesh* rocket_mesh;
+  Mesh* platform_mesh;
+  Mesh* square_mesh;
+  unsigned int platform_texture;
+  unsigned int rocket_texture[3];
+  unsigned int puff_texture[25];
   glm::vec3 puff_locale[25];
 };
 
@@ -38,35 +34,26 @@ void draw_launch_scene(RenderSystem* rs)
 }
 
 
-std::string ZeroPadNumber(int num)
-{
-    std::ostringstream ss;
-    ss << std::setw( 2 ) << std::setfill( '0' ) << num;
-    return ss.str();
-}
-
-
 bool LaunchScene::init()
 {
   if (is_init) return true;
 
   Random::init();
 
-  rocket_mesh.load_obj("data/objects/rocket/retro toy rocket.obj");
-  rocket_mesh.upload();
-  platform_mesh.load_obj("data/objects/rocket/launch_platform.obj");
-  platform_mesh.upload();
-  square_mesh.load_obj("data/square.obj");
-  square_mesh.upload();
+  unsigned int handle;
+  g_rm.getResource("rocket", handle); rocket_mesh = (Mesh*)handle;
+  g_rm.getResource("launch platform", handle); platform_mesh = (Mesh*)handle;
+  g_rm.getResource("square", handle); square_mesh = (Mesh*)handle;
 
-  platform_texture.loadPng("data/objects/rocket/launch_texture.png");
-  rocket_texture[0].loadPng("data/objects/rocket/mtl4.png");
-  rocket_texture[1].loadPng("data/objects/rocket/mtl3.png");
-  rocket_texture[2].loadPng("data/objects/rocket/mtl1.png");
+  g_rm.getResource("launch_texture", platform_texture);
+  g_rm.getResource("mtl1", rocket_texture[0]);
+  g_rm.getResource("mtl3", rocket_texture[1]);
+  g_rm.getResource("mtl4", rocket_texture[2]);
 
   for (int i = 0; i < 25; ++i)
   {
-    puff_texture[i].loadPng((std::string("data/objects/White puff/whitePuff") + ZeroPadNumber(i) + std::string(".png")).c_str());
+    std::string resource = std::string("whitePuff") + ZeroPadNumber(i);
+    g_rm.getResource(resource.c_str(), puff_texture[i]);
   }
 
   for (int i = 0; i < 25; ++i)
@@ -83,17 +70,11 @@ bool LaunchScene::init()
 
 void LaunchScene::draw(RenderSystem* rs)
 {
-  // Camera
-  // glm::vec3 camera_eye(100, 70, 100);
-  // glm::vec3 centre(0, 0, 0);
-  // glm::vec3 up(0, 1, 0);
-  // //glm::vec3 up(0, 0, 1);
-  // glm::mat4 cameraView = glm::lookAt(camera_eye, centre, up);
-  // glm::mat4 cameraProjection = glm::perspective(glm::radians(14.5f), (float)g_windowManager.width / (float)g_windowManager.height, 1.0f, 200.0f);
-  // rs->setViewProj(cameraProjection * cameraView);
-
+  // Some gl setting
+  glActiveTexture(GL_TEXTURE0);
+  
   // Platforms
-  platform_texture.bind();
+  glBindTexture(GL_TEXTURE_2D, platform_texture);
   for (int i = -1; i < 2; ++i)
   {
     for (int j = 0; j < 2; ++j)
@@ -104,8 +85,8 @@ void LaunchScene::draw(RenderSystem* rs)
       rs->setModelLocal(x);
 
       // Render
-      rs->bindMesh(&platform_mesh);
-      rs->bindMeshElement(&platform_mesh, 0);
+      rs->bindMesh(platform_mesh);
+      rs->bindMeshElement(platform_mesh, 0);
       rs->drawMesh();
     }
   }
@@ -124,11 +105,11 @@ void LaunchScene::draw(RenderSystem* rs)
       rs->setModelLocal(x);
 
       // Render
-      rs->bindMesh(&rocket_mesh);
-      for (int i = 0; i < rocket_mesh.m_matIboElements.size(); ++i)
+      rs->bindMesh(rocket_mesh);
+      for (int i = 0; i < rocket_mesh->m_matIboElements.size(); ++i)
       {
-        rocket_texture[i].bind();
-        rs->bindMeshElement(&rocket_mesh, i);
+        glBindTexture(GL_TEXTURE_2D, rocket_texture[i]);
+        rs->bindMeshElement(rocket_mesh, i);
         rs->drawMesh();
       }
 
@@ -136,13 +117,6 @@ void LaunchScene::draw(RenderSystem* rs)
   glDepthMask(false);
   if (g_gameData.fleet[0].order.pickup_amount > 0)
   {
-    // glm::vec3 scale;
-    // glm::quat rotation;
-    // glm::vec3 translation;
-    // glm::vec3 skew;
-    // glm::vec4 perspective;
-    // glm::decompose(cameraView, scale, rotation, translation, skew, perspective);
-
     for (int i = 0; i < 25; ++i)
     {
       glm::mat4 x(1.0);
@@ -155,9 +129,9 @@ void LaunchScene::draw(RenderSystem* rs)
       x = glm::scale(x, glm::vec3(2.f, 2.f, 2.f));
       rs->setModelLocal(x);
 
-      puff_texture[i].bind();
-      rs->bindMesh(&square_mesh);
-      rs->bindMeshElement(&square_mesh, 0);
+      glBindTexture(GL_TEXTURE_2D, puff_texture[i]);
+      rs->bindMesh(square_mesh);
+      rs->bindMeshElement(square_mesh, 0);
       rs->drawMesh();  
     }
   }

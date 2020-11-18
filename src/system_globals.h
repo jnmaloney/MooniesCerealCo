@@ -28,3 +28,6 @@ float camDistance = 18.0;
 void im_disable_buttons();
 void im_enable_buttons();
 bool im_is_button_disabled();
+
+
+std::string ZeroPadNumber(int num);

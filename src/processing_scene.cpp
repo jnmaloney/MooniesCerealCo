@@ -1,8 +1,6 @@
 #include "processing_scene.h"
 #include "RenderSystem.h"
 #include "Mesh.h"
-#include "Mesh_obj.h"
-#include "Texture.h"
 #include "system_globals.h"
 #include <sstream>
 #include <iomanip>
@@ -18,9 +16,9 @@ public:
 
 protected:
   bool is_init = false;
-  Mesh_obj conveyor_mesh;
-  Mesh_obj conveyor_belt_mesh;
-  Texture conveyor_texture[3];
+  Mesh* conveyor_mesh;
+  Mesh* conveyor_belt_mesh;
+  unsigned int conveyor_texture[3];
 };
 
 
@@ -38,15 +36,11 @@ bool ProcessingScene::init()
 {
   if (is_init) return true;
 
-  conveyor_mesh.load_obj("data/objects/conveyor/conveyor bake.obj");
-  conveyor_mesh.upload();
-  conveyor_belt_mesh.load_obj("data/objects/conveyor/conveyor belt isolated.obj");
-  conveyor_belt_mesh.upload();
+  g_rm.getResource("conveyor body", (void**)&conveyor_mesh);
+  g_rm.getResource("conveyor belt", (void**)&conveyor_belt_mesh);
 
-  conveyor_texture[0].loadPng("data/objects/conveyor/conveyor_tile.png");
-  conveyor_texture[1].loadPng("data/objects/conveyor/conveyor_side.png");
-  conveyor_texture[2].loadPng("data/objects/conveyor/ao_target.png");
-
+  g_rm.getResource("conveyor body(tex)", conveyor_texture[0]);
+  g_rm.getResource("conveyor belt(tex)", conveyor_texture[1]);
 
   is_init = true;
   return true;
@@ -55,17 +49,11 @@ bool ProcessingScene::init()
 
 void ProcessingScene::draw(RenderSystem* rs)
 {
-  // Camera
-  // glm::vec3 camera_eye(100, 70, 100);
-  // glm::vec3 centre(0, 0, 0);
-  // glm::vec3 up(0, 1, 0);
-  // //glm::vec3 up(0, 0, 1);
-  // glm::mat4 cameraView = glm::lookAt(camera_eye, centre, up);
-  // glm::mat4 cameraProjection = glm::perspective(glm::radians(14.5f), (float)g_windowManager.width / (float)g_windowManager.height, 1.0f, 200.0f);
-  // rs->setViewProj(cameraProjection * cameraView);
+  // Some gl setting
+  glActiveTexture(GL_TEXTURE0);
 
   // Conveyor
-  conveyor_texture[2].bind();
+  glBindTexture(GL_TEXTURE_2D, conveyor_texture[0]);
 
   // Set local
   glm::mat4 x(1.0);
@@ -73,21 +61,20 @@ void ProcessingScene::draw(RenderSystem* rs)
   rs->setModelLocal(x);
 
   // Render
-  rs->bindMesh(&conveyor_mesh);
-  for (int i = 0; i < conveyor_mesh.m_matIboElements.size(); ++i)
+  rs->bindMesh(conveyor_mesh);
+  for (int i = 0; i < conveyor_mesh->m_matIboElements.size(); ++i)
   {
-    rs->bindMeshElement(&conveyor_mesh, i);
+    rs->bindMeshElement(conveyor_mesh, i);
     rs->drawMesh();
   }
 
   // Belt
-  rs->bindMesh(&conveyor_belt_mesh);
+  rs->bindMesh(conveyor_belt_mesh);
 
-  conveyor_texture[0].bind();
-  rs->bindMeshElement(&conveyor_belt_mesh, 0);
+  glBindTexture(GL_TEXTURE_2D, conveyor_texture[1]);
+  rs->bindMeshElement(conveyor_belt_mesh, 0);
   rs->drawMesh();
 
-  conveyor_texture[1].bind();
-  rs->bindMeshElement(&conveyor_belt_mesh, 1);
+  rs->bindMeshElement(conveyor_belt_mesh, 1);
   rs->drawMesh();
 }
