@@ -85,25 +85,26 @@ int main(int argc, char** argv)
   // Resources (async loading)
 
   // UI
-  g_rm.addResource("ui_title", "resources/ui_elemnt_1.png", ResourceManager::PNG);
+  g_rm.addResource("title card", "resources/title card.png", ResourceManager::PNG);
+  g_rm.addResource("ui_character_name", "resources/ui_elemnt_1.png", ResourceManager::PNG);
 
   // Misc
   g_rm.addResource("square", "resources/square.obj", ResourceManager::OBJ);
 
   // - Portraits - 
-  // g_rm.addResource("Girl(angr_alt)",    "resources/portrait/girl/angr_alt.png", ResourceManager::PNG);
-  // g_rm.addResource("Girl(angr_smile)",  "resources/portrait/girl/angr_smile.png", ResourceManager::PNG);
-  // g_rm.addResource("Girl(neutral)",     "resources/portrait/girl/neutral.png", ResourceManager::PNG);
-  // g_rm.addResource("Girl(smiler)",      "resources/portrait/girl/smiler.png", ResourceManager::PNG);
+  g_rm.addResource("Girl(angr_alt)",    "resources/portrait/girl/angr_alt.png", ResourceManager::PNG);
+  g_rm.addResource("Girl(angr_smile)",  "resources/portrait/girl/angr_smile.png", ResourceManager::PNG);
+  g_rm.addResource("Girl(neutral)",     "resources/portrait/girl/neutral.png", ResourceManager::PNG);
+  g_rm.addResource("Girl(smiler)",      "resources/portrait/girl/smiler.png", ResourceManager::PNG);
  
-  // g_rm.addResource("Moonie(neutral)", "resources/portrait/moonie/neutral.png", ResourceManager::PNG);
-  // g_rm.addResource("Moonie(smiler)",  "resources/portrait/moonie/smiler.png", ResourceManager::PNG);
+  g_rm.addResource("Moonie(neutral)", "resources/portrait/moonie/neutral.png", ResourceManager::PNG);
+  g_rm.addResource("Moonie(smiler)",  "resources/portrait/moonie/smiler.png", ResourceManager::PNG);
  
-  // g_rm.addResource("Bot(ex)",       "resources/portrait/bot/exclamation_mark.png", ResourceManager::PNG);
-  // g_rm.addResource("Bot(neutral)",  "resources/portrait/bot/neutral.png", ResourceManager::PNG);
-  // g_rm.addResource("Bot(qu)",       "resources/portrait/bot/question_mark.png", ResourceManager::PNG);
-  // g_rm.addResource("Bot(smile)",    "resources/portrait/bot/smile_emote.png", ResourceManager::PNG);
-  // g_rm.addResource("Bot(zzz)",      "resources/portrait/bot/zzz.png", ResourceManager::PNG);
+  g_rm.addResource("Bot(ex)",       "resources/portrait/bot/exclamation_mark.png", ResourceManager::PNG);
+  g_rm.addResource("Bot(neutral)",  "resources/portrait/bot/neutral.png", ResourceManager::PNG);
+  g_rm.addResource("Bot(qu)",       "resources/portrait/bot/question_mark.png", ResourceManager::PNG);
+  g_rm.addResource("Bot(smile)",    "resources/portrait/bot/smile_emote.png", ResourceManager::PNG);
+  g_rm.addResource("Bot(zzz)",      "resources/portrait/bot/zzz.png", ResourceManager::PNG);
 
   // - 3D's -
   g_rm.addResource("conveyor body",       "resources/objects/conveyor/conveyor bake.obj", ResourceManager::OBJ);

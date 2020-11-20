@@ -31,6 +31,12 @@ void Dialog::load(const char* filename)
     std::getline(g, n, ':');
     std::getline(g, m, '\n');
 
+    // Trim m
+    while (m.length() && m.substr(0, 1) == " ")
+    {
+      m = m.substr(1, m.length() - 1);
+    }
+
     talkEvents.push_back(
       (TalkEvent){ n, 0, 0, m }
     );   

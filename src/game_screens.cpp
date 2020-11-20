@@ -604,23 +604,33 @@ void launch_page()
 
 void draw_mainmenu()
 {
-  ImGui::Text("Moonies Cereal Co (Week 2 build)");
-
-  //ImGui::Begin("MainMenu");
-  if (ImGui::Button("New Game"))
-  {    
-    g_gameData.page = Home;
-  }
-
-  ImGui::Separator();
-
-  if (ImGui::Button("Free Play"))
+  unsigned int title_card_id = 0;
+  if (g_rm.getResource("title card", title_card_id))
   {
-    //s_dialogManager.dialog.talkEvents.clear();
-    inited = true;
-    g_gameData.page = Home;
+    ImVec2 pivot_point(238, 198);
+    ImGui::SetCursorPos(ImVec2(g_windowManager.width/2 - pivot_point.x, g_windowManager.height/2 - pivot_point.y));      
+    ImGui::Image((ImTextureID)title_card_id, ImVec2(501, 355));
+
+    //ImGui::SetCursorPos(ImVec2(235, 99));      
+    //ImGui::SetCursorPos(ImVec2(588, 360));      
+    ImVec2 pivot_point_a(238 - 353, 198 - 261);
+    ImGui::SetCursorPos(ImVec2(g_windowManager.width/2 - pivot_point_a.x, g_windowManager.height/2 - pivot_point_a.y));      
+    if (ImGui::Button("New Game"))
+    {    
+      g_gameData.page = Home;
+    }
+
+    ImVec2 pivot_point_b(238 - 353, 198 - 316);
+    //ImGui::SetCursorPos(ImVec2(588, 415));      
+    ImGui::SetCursorPos(ImVec2(g_windowManager.width/2 - pivot_point_b.x, g_windowManager.height/2 - pivot_point_b.y));      
+    if (ImGui::Button("Free Play"))
+    {
+      //s_dialogManager.dialog.talkEvents.clear();
+      inited = true;
+      g_gameData.page = Home;
+    }
+    //ImGui::End();
   }
-  //ImGui::End();
 }
 
 
