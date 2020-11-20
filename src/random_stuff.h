@@ -18,6 +18,7 @@
 
 #include "launch_scene.h"
 #include "processing_scene.h"
+#include "mining_scene.h"
 
 
 int fulfil(int location, int amount)
@@ -181,13 +182,18 @@ void loop()
   g_rs->start();
   
 if (g_gameData.page == Launchpad)
-  {
-    draw_launch_scene(g_rs);
-  }
-  else if (g_gameData.page == Processing)
-  {
-    draw_processing_scene(g_rs);
-  }
+{
+  draw_launch_scene(g_rs);
+}
+else if (g_gameData.page == Processing)
+{
+  draw_processing_scene(g_rs);
+}
+else if (g_gameData.page == Mining)
+{
+  draw_mining_scene(g_rs);
+}
+
 
   g_menuManager.predraw();
 
@@ -375,7 +381,7 @@ if (g_gameData.page == Launchpad)
   else if (g_gameData.page == Mining)
   {
     drawHeaderBar();
-    drawContent(NULL);
+    drawContent(&mining_page);
     drawFooterBar();
   }
 

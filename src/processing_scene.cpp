@@ -41,6 +41,10 @@ bool ProcessingScene::init()
 
   g_rm.getResource("conveyor body(tex)", conveyor_texture[0]);
   g_rm.getResource("conveyor belt(tex)", conveyor_texture[1]);
+  g_rm.getResource("conveyor side(tex)", conveyor_texture[2]);
+
+  inspect(conveyor_mesh);
+  inspect(conveyor_belt_mesh);
 
   is_init = true;
   return true;
@@ -49,6 +53,9 @@ bool ProcessingScene::init()
 
 void ProcessingScene::draw(RenderSystem* rs)
 {
+  //rs->m_shaderManager.setShader("Default");
+  rs->m_shaderManager.setParam("Scrolling", "scroll", 0.0f);
+
   // Some gl setting
   glActiveTexture(GL_TEXTURE0);
 
@@ -69,12 +76,24 @@ void ProcessingScene::draw(RenderSystem* rs)
   }
 
   // Belt
+  static float s_scroll = 0.f;
+  s_scroll = fmod(s_scroll + 1.0/60.f, 1.f);
+
+  // rs->m_shaderManager.setShader("Scrolling");
+  // rs->m_shaderManager.update(rs);
+  rs->m_shaderManager.setParam("Scrolling", "scroll", s_scroll);
+
   rs->bindMesh(conveyor_belt_mesh);
 
   glBindTexture(GL_TEXTURE_2D, conveyor_texture[1]);
   rs->bindMeshElement(conveyor_belt_mesh, 0);
   rs->drawMesh();
 
+  //rs->m_shaderManager.setShader("Default");
+  rs->m_shaderManager.setParam("Scrolling", "scroll", 0.0f);
+
+  // setshader("scrolling_uv");
+  glBindTexture(GL_TEXTURE_2D, conveyor_texture[2]);
   rs->bindMeshElement(conveyor_belt_mesh, 1);
   rs->drawMesh();
 }

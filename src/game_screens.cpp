@@ -4,7 +4,7 @@
 #include "imgui_internal.h" //itemflags
 #include "implot.h"
 #include "palette.h"
-#include "launch_scene.h"
+//#include "launch_scene.h"
 #include "dialog_manager.h"
 
 
@@ -601,6 +601,7 @@ void launch_page()
 
 }
 
+
 void draw_mainmenu()
 {
   ImGui::Text("Moonies Cereal Co (Week 2 build)");
@@ -620,4 +621,10 @@ void draw_mainmenu()
     g_gameData.page = Home;
   }
   //ImGui::End();
+}
+
+
+void mining_page()
+{
+  // not here... draw_mining_scene(g_rs);
 }

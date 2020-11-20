@@ -26,3 +26,5 @@ void launch_page();
 void draw_dialog();
 
 void draw_mainmenu();
+
+void mining_page();

@@ -33,7 +33,15 @@ int main(int argc, char** argv)
   identityMatrix = glm::mat4(1.0);
   objectMatrix = glm::mat4(1.0);
   g_rs->setViewProj(cameraProjection * cameraView);
-
+  
+  // Shaders
+  // g_rs->m_shaderManager.loadProgram(
+  //   "Scrolling",
+  //   "data/shaders/scroll.vert",
+  //   "data/shaders/base.frag"
+  // );
+  // g_rs->m_shaderManager.setParam("Scrolling", "scroll", 0.f);
+  
   // Palette
   load_palette("/data/material_palette.csv");
 
@@ -73,7 +81,7 @@ int main(int argc, char** argv)
   ImPlot::GetStyle().LineWeight = 8.0f;
   ImPlot::GetStyle().AntiAliasedLines = true;
   ImPlot::GetStyle().Colors[ImPlotCol_Line] = ImColor(g_palette["indigo_200"]);
-  
+
   // Resources (async loading)
 
   // UI
@@ -83,32 +91,37 @@ int main(int argc, char** argv)
   g_rm.addResource("square", "resources/square.obj", ResourceManager::OBJ);
 
   // - Portraits - 
-  g_rm.addResource("Girl(angr_alt)", "resources/portrait/girl/angr_alt.png", ResourceManager::PNG);
-  g_rm.addResource("Girl(angr_smile)", "resources/portrait/girl/angr_smile.png", ResourceManager::PNG);
-  g_rm.addResource("Girl(neutral)", "resources/portrait/girl/neutral.png", ResourceManager::PNG);
-  g_rm.addResource("Girl(smiler)", "resources/portrait/girl/smiler.png", ResourceManager::PNG);
+  // g_rm.addResource("Girl(angr_alt)",    "resources/portrait/girl/angr_alt.png", ResourceManager::PNG);
+  // g_rm.addResource("Girl(angr_smile)",  "resources/portrait/girl/angr_smile.png", ResourceManager::PNG);
+  // g_rm.addResource("Girl(neutral)",     "resources/portrait/girl/neutral.png", ResourceManager::PNG);
+  // g_rm.addResource("Girl(smiler)",      "resources/portrait/girl/smiler.png", ResourceManager::PNG);
  
-  g_rm.addResource("Moonie(neutral)", "resources/portrait/moonie/neutral.png", ResourceManager::PNG);
-  g_rm.addResource("Moonie(smiler)", "resources/portrait/moonie/smiler.png", ResourceManager::PNG);
+  // g_rm.addResource("Moonie(neutral)", "resources/portrait/moonie/neutral.png", ResourceManager::PNG);
+  // g_rm.addResource("Moonie(smiler)",  "resources/portrait/moonie/smiler.png", ResourceManager::PNG);
  
-  g_rm.addResource("Bot(ex)", "resources/portrait/bot/exclamation_mark.png", ResourceManager::PNG);
-  g_rm.addResource("Bot(neutral)", "resources/portrait/bot/neutral.png", ResourceManager::PNG);
-  g_rm.addResource("Bot(qu)", "resources/portrait/bot/question_mark.png", ResourceManager::PNG);
-  g_rm.addResource("Bot(smile)", "resources/portrait/bot/smile_emote.png", ResourceManager::PNG);
-  g_rm.addResource("Bot(zzz)", "resources/portrait/bot/zzz.png", ResourceManager::PNG);
+  // g_rm.addResource("Bot(ex)",       "resources/portrait/bot/exclamation_mark.png", ResourceManager::PNG);
+  // g_rm.addResource("Bot(neutral)",  "resources/portrait/bot/neutral.png", ResourceManager::PNG);
+  // g_rm.addResource("Bot(qu)",       "resources/portrait/bot/question_mark.png", ResourceManager::PNG);
+  // g_rm.addResource("Bot(smile)",    "resources/portrait/bot/smile_emote.png", ResourceManager::PNG);
+  // g_rm.addResource("Bot(zzz)",      "resources/portrait/bot/zzz.png", ResourceManager::PNG);
 
   // - 3D's -
-  g_rm.addResource("conveyor body", "resources/objects/conveyor/conveyor bake.obj", ResourceManager::OBJ);
-  g_rm.addResource("conveyor belt", "resources/objects/conveyor/conveyor belt isolated.obj", ResourceManager::OBJ);
-  g_rm.addResource("conveyor body(tex)", "resources/objects/conveyor/ao_target.png", ResourceManager::PNG);
-  g_rm.addResource("conveyor belt(tex)", "resources/objects/conveyor/conveyor_tile.png", ResourceManager::PNG);
+  g_rm.addResource("conveyor body",       "resources/objects/conveyor/conveyor bake.obj", ResourceManager::OBJ);
+  g_rm.addResource("conveyor belt",       "resources/objects/conveyor/conveyor belt isolated.obj", ResourceManager::OBJ);
+  g_rm.addResource("conveyor body(tex)",  "resources/objects/conveyor/ao_target.png", ResourceManager::PNG);
+  g_rm.addResource("conveyor belt(tex)",  "resources/objects/conveyor/conveyor_tile.png", ResourceManager::PNG);
+  g_rm.addResource("conveyor side(tex)",  "resources/objects/conveyor/conveyor_side.png", ResourceManager::PNG);
 
-  g_rm.addResource("rocket", "resources/objects/rocket/retro toy rocket.obj", ResourceManager::OBJ);
+  g_rm.addResource("rocket",          "resources/objects/rocket/retro toy rocket.obj", ResourceManager::OBJ);
   g_rm.addResource("launch platform", "resources/objects/rocket/launch_platform.obj", ResourceManager::OBJ);
-  g_rm.addResource("mtl1", "resources/objects/rocket/mtl1.png", ResourceManager::PNG);
-  g_rm.addResource("mtl3", "resources/objects/rocket/mtl3.png", ResourceManager::PNG);
-  g_rm.addResource("mtl4", "resources/objects/rocket/mtl4.png", ResourceManager::PNG);
-  g_rm.addResource("launch_texture", "resources/objects/rocket/launch_texture.png", ResourceManager::PNG);
+  g_rm.addResource("mtl1",            "resources/objects/rocket/mtl1.png", ResourceManager::PNG);
+  g_rm.addResource("mtl3",            "resources/objects/rocket/mtl3.png", ResourceManager::PNG);
+  g_rm.addResource("mtl4",            "resources/objects/rocket/mtl4.png", ResourceManager::PNG);
+  g_rm.addResource("launch_texture",  "resources/objects/rocket/launch_texture.png", ResourceManager::PNG);
+
+  g_rm.addResource("mining body",       "resources/objects/mining/test_miner.obj", ResourceManager::OBJ);
+  g_rm.addResource("mining cog",        "resources/objects/mining/test_miner coggo.obj", ResourceManager::OBJ);
+  g_rm.addResource("mining body(tex)",  "resources/objects/mining/mining_ao.png", ResourceManager::PNG);
 
   // Particles
   for (int i = 0; i < 25; ++i)
