@@ -9,6 +9,7 @@
 
 
 
+RenderSystem* gs_renderSystem();
 WindowManager& gs_windowManager();
 MenuManager& gs_menuManager();
 ResourceManager& gs_resourceManager();
@@ -16,7 +17,7 @@ ResourceManager& gs_resourceManager();
 
 namespace 
 {
-RenderSystem* g_rs = 0;
+RenderSystem* g_rs = gs_renderSystem();
 WindowManager& g_windowManager = gs_windowManager();
 MenuManager& g_menuManager = gs_menuManager();
 ResourceManager& g_rm = gs_resourceManager();

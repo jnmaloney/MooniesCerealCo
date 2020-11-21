@@ -4,6 +4,7 @@
 enum PAGES
 {
   MainMenu = 0,
+  Card, 
   Home,
   Launchpad,
   Mining,
@@ -24,6 +25,7 @@ void upgrade_ship_page();
 void launch_page();
 
 void draw_dialog();
+bool no_dialog();
 
 void draw_mainmenu();
 

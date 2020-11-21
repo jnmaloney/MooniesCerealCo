@@ -27,6 +27,12 @@ void draw_dialog()
 }
 
 
+bool no_dialog()
+{
+  return s_dialogManager.dialog.talkEvents.size() == 0;
+}
+
+
 void drawHeaderBar()
 {
   ImGui::GetWindowDrawList()->AddRectFilled(

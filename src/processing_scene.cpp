@@ -18,6 +18,7 @@ protected:
   bool is_init = false;
   Mesh* conveyor_mesh;
   Mesh* conveyor_belt_mesh;
+  Mesh* stuff;
   unsigned int conveyor_texture[3];
 };
 
@@ -38,6 +39,7 @@ bool ProcessingScene::init()
 
   g_rm.getResource("conveyor body", (void**)&conveyor_mesh);
   g_rm.getResource("conveyor belt", (void**)&conveyor_belt_mesh);
+  g_rm.getResource("square", (void**)&stuff);
 
   g_rm.getResource("conveyor body(tex)", conveyor_texture[0]);
   g_rm.getResource("conveyor belt(tex)", conveyor_texture[1]);
@@ -77,7 +79,7 @@ void ProcessingScene::draw(RenderSystem* rs)
 
   // Belt
   static float s_scroll = 0.f;
-  s_scroll = fmod(s_scroll + 1.0/60.f, 1.f);
+  s_scroll = fmod(s_scroll + 0.10/60.f, 1.f);
 
   // rs->m_shaderManager.setShader("Scrolling");
   // rs->m_shaderManager.update(rs);
@@ -96,4 +98,24 @@ void ProcessingScene::draw(RenderSystem* rs)
   glBindTexture(GL_TEXTURE_2D, conveyor_texture[2]);
   rs->bindMeshElement(conveyor_belt_mesh, 1);
   rs->drawMesh();
+
+  // Stuff on the conveyor belt
+  // (1, 9) -> (1, -4)
+
+  static float f = 13.0f / 3.0f;
+  static float offset = 0.f;
+  offset = fmod(offset + 0.10/60.0 * 2.0f, f);
+
+  rs->bindMesh(stuff);
+  rs->bindMeshElement(stuff, 0);
+
+  for (int i = 0; i < 3; ++i)
+  {
+    glm::mat4 x(1.0);
+    x = glm::translate(x, glm::vec3(0.f, -9.0f + i * f + offset, 1.5f));
+    x = glm::rotate(x, (float)M_PI*0.5f, glm::vec3(0.f, 1.f, 0.f));
+    rs->setModelLocal(x);
+ 
+    rs->drawMesh();
+  }
 }

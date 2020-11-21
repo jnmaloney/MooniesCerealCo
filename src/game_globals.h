@@ -73,6 +73,17 @@ struct Launch
   bool returned;
 };
 //Launch& Launch::operator=(const Launch&) = default;
+
+
+    std::vector<Ship> fleets = {
+      Ship((ShipData){ 3.49, 1000, 35000, 0 }),
+      Ship((ShipData){ 4.0, 1500, 70000, 0 }),
+      Ship((ShipData){ 3.2, 800, 75000, 0}),
+      Ship((ShipData){ 9.0, 7500, 900000, 0 }),
+    };  
+
+
+
 }
 
 struct SecretFunctions

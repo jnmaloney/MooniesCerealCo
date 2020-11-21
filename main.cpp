@@ -11,6 +11,7 @@
 #include "system_globals.h"
 #include "game_globals.h"
 #include "palette.h"
+#include "game_render_system.h"
 
 
 //extern "C" 
@@ -21,7 +22,6 @@ int main(int argc, char** argv)
   g_windowManager.init("Project");
   g_menuManager.init(g_windowManager);
 
-  g_rs = new RenderSystem();
   g_rs->init();
   g_rs->setClearColour(52, 101, 164);
 
