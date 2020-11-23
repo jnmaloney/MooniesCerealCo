@@ -617,17 +617,14 @@ void draw_mainmenu()
     ImGui::SetCursorPos(ImVec2(g_windowManager.width/2 - pivot_point.x, g_windowManager.height/2 - pivot_point.y));      
     ImGui::Image((ImTextureID)title_card_id, ImVec2(501, 355));
 
-    //ImGui::SetCursorPos(ImVec2(235, 99));      
-    //ImGui::SetCursorPos(ImVec2(588, 360));      
     ImVec2 pivot_point_a(238 - 353, 198 - 261);
     ImGui::SetCursorPos(ImVec2(g_windowManager.width/2 - pivot_point_a.x, g_windowManager.height/2 - pivot_point_a.y));      
     if (ImGui::Button("New Game"))
     {    
-      g_gameData.page = Home;
+      g_gameData.page = Card;
     }
 
     ImVec2 pivot_point_b(238 - 353, 198 - 316);
-    //ImGui::SetCursorPos(ImVec2(588, 415));      
     ImGui::SetCursorPos(ImVec2(g_windowManager.width/2 - pivot_point_b.x, g_windowManager.height/2 - pivot_point_b.y));      
     if (ImGui::Button("Free Play"))
     {

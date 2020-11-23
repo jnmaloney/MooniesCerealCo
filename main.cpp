@@ -25,14 +25,18 @@ int main(int argc, char** argv)
   g_rs->init();
   g_rs->setClearColour(52, 101, 164);
 
-  glm::vec3 eye = camDistance * glm::vec3(1, 1, 0.45);
-  glm::vec3 centre(0, 0, 0.9);
-  glm::vec3 up(0, 0, 1);
-  cameraView = glm::lookAt(eye, centre, up);
-  cameraProjection = glm::perspective(45.0f, (float)g_windowManager.width / (float)g_windowManager.height, 1.0f, 200.0f);
-  identityMatrix = glm::mat4(1.0);
-  objectMatrix = glm::mat4(1.0);
-  g_rs->setViewProj(cameraProjection * cameraView);
+  //printf("11: 0x%x\n", (size_t)g_rs);
+
+  //glm::vec3 eye = camDistance * glm::vec3(1, 1, 0.45);
+  // glm::vec3 eye = 15.f * glm::vec3(1, 1, 0.45);
+  // glm::vec3 centre(0, 0, 0);
+  // glm::vec3 up(0, 0, 1);
+  // cameraView = glm::lookAt(eye, centre, up);
+  // cameraProjection = glm::perspective(45.0f, (float)g_windowManager.width / (float)g_windowManager.height, 1.0f, 2000.0f);
+  // identityMatrix = glm::mat4(1.0);
+  // objectMatrix = glm::mat4(1.0);
+  // g_rs->setViewProj(cameraProjection * cameraView);
+  // g_rs->setModelLocal(objectMatrix);
   
   // Shaders
   // g_rs->m_shaderManager.loadProgram(
@@ -120,9 +124,8 @@ int main(int argc, char** argv)
   g_rm.addResource("mtl4",            "resources/objects/rocket/mtl4.png", ResourceManager::PNG);
   g_rm.addResource("launch_texture",  "resources/objects/rocket/launch_texture.png", ResourceManager::PNG);
 
-  g_rm.addResource("mining body",       "resources/objects/mining/test_miner.obj", ResourceManager::OBJ);
-  g_rm.addResource("mining cog",        "resources/objects/mining/test_miner coggo.obj", ResourceManager::OBJ);
-  g_rm.addResource("mining body(tex)",  "resources/objects/mining/mining_ao.png", ResourceManager::PNG);
+  g_rm.addResource("mining body",       "resources/objects/mining/safe_miner_singleobject.obj", ResourceManager::OBJ);
+  g_rm.addResource("mining body(tex)",  "resources/objects/mining/texture_11 some bake.png", ResourceManager::PNG);
 
   // Particles
   for (int i = 0; i < 25; ++i)
@@ -134,6 +137,17 @@ int main(int argc, char** argv)
 
   // - Audio - 
 
+  //
+  glm::vec3 eye = 15.f * glm::vec3(1, 1, 0.45);
+  glm::vec3 centre(0, 0, 0);
+  glm::vec3 up(0, 0, 1);
+  cameraView = glm::lookAt(eye, centre, up);
+  cameraProjection = glm::perspective(45.0f, (float)g_windowManager.width / (float)g_windowManager.height, 1.0f, 2000.0f);
+  identityMatrix = glm::mat4(1.0);
+  objectMatrix = glm::mat4(1.0);
+  g_rs->setViewProj(cameraProjection * cameraView);
+  g_rs->setModelLocal(objectMatrix);
+
   // Start the async load
   g_rm.start_async_load();
 
@@ -141,7 +155,7 @@ int main(int argc, char** argv)
   g_gameData.fleet.push_back(Ship((ShipData){ 3.4f, 2000, 18000, 0 }));
 
   #ifdef __EMSCRIPTEN__
-  emscripten_set_main_loop(loop, 0, 1);
+  emscripten_set_main_loop(game_render_system::loop, 0, 1);
   #endif
 
   glfwTerminate();

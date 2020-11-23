@@ -4,19 +4,15 @@
 #include "RenderSystem.h"
 
 
-static RenderSystem* s_renderSystem = 0;
 static WindowManager s_windowManager;
 static MenuManager s_menuManager;
 static ResourceManager s_resourceManager;
+static RenderSystem s_renderSystem; // after window manager
 
 
 RenderSystem* gs_renderSystem()
 {
-  if (s_renderSystem == 0)
-  {
-    s_renderSystem = new RenderSystem();
-  }
-  return s_renderSystem;
+  return &s_renderSystem;
 }
 
 

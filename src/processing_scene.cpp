@@ -70,11 +70,11 @@ void ProcessingScene::draw(RenderSystem* rs)
   rs->setModelLocal(x);
 
   // Render
-  rs->bindMesh(conveyor_mesh);
+  g_rs->bindMesh(conveyor_mesh);
   for (int i = 0; i < conveyor_mesh->m_matIboElements.size(); ++i)
   {
-    rs->bindMeshElement(conveyor_mesh, i);
-    rs->drawMesh();
+    g_rs->bindMeshElement(conveyor_mesh, i);
+    g_rs->drawMesh();
   }
 
   // Belt

@@ -16,17 +16,21 @@
 #include "mining_scene.h"
 
 
-//namespace  {
+namespace game_render_system
+{
   
 void loop()
 {
+  g_rs->m_window.width = 1280;
+  g_rs->m_window.height = 800;
+
   g_gameData.update_timer();
 
   ImGuiIO& io = ImGui::GetIO();
 
   g_rs->start();
-  return;
-  
+  //printf("rs: 0x%x\n", (size_t)g_rs);
+
   if (g_gameData.page == Launchpad)
   {
     draw_launch_scene(g_rs);
@@ -62,11 +66,11 @@ void loop()
   else if (g_gameData.page == Card)
   {
     // Draw Moon card
-    float radius = g_windowManager.height / 8;
+    float radius = g_windowManager.height / 3.5f;
     ImGui::GetWindowDrawList()->AddCircleFilled(
-      ImVec2(g_windowManager.width / 2, g_windowManager.height / 2),
+      ImVec2(0.5f * g_windowManager.width, 0.5f * g_windowManager.height),
       radius,
-      ImColor(0xd59e61),
+      ImColor(0xd5, 0x9e, 0x61, 0xff),
       51
     );
 
@@ -256,6 +260,19 @@ void loop()
 
   g_menuManager.postdraw();
 
+    if (g_gameData.page == Launchpad)
+  {
+    draw_launch_scene(g_rs);
+  }
+  else if (g_gameData.page == Processing)
+  {
+    draw_processing_scene(g_rs);
+  }
+  else if (g_gameData.page == Mining)
+  {
+    draw_mining_scene(g_rs);
+  }
+
   g_rs->end();
 }
 
@@ -275,7 +292,7 @@ void drawContent(std::function<void()> f_ptr)
 }
 
 
-//} // namespace game_render_system
+} // namespace game_render_system
 
 
 // namespace 
@@ -299,5 +316,6 @@ void im_enable_buttons()
 
 
 bool im_is_button_disabled() { return s_buttons_disabled; }
+
 
 //} // namespace

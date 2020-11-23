@@ -37,9 +37,9 @@ bool MiningScene::init()
   if (is_init) return true;
 
   g_rm.getResource("mining body", (void**)&mining_mesh);
-  g_rm.getResource("mining cog", (void**)&mining_cog_mesh);
-  inspect(mining_mesh);
-  inspect(mining_cog_mesh);
+  // g_rm.getResource("mining cog", (void**)&mining_cog_mesh);
+  // inspect(mining_mesh);
+  // inspect(mining_cog_mesh);
 
   g_rm.getResource("mining body(tex)", mining_texture);
 
@@ -67,20 +67,18 @@ void MiningScene::draw(RenderSystem* rs)
   rs->bindMeshElement(mining_mesh, 0);
   rs->drawMesh();
 
-  // Set local
-  static float t = 0.f;
-  t = fmod(t + 0.015f, 2.f * M_PI);
+  // // Set local
+  // static float t = 0.f;
+  // t = fmod(t + 0.015f, 2.f * M_PI);
 
-  glm::mat4 y(1.0);
-  //y = glm::rotate(y, (float)M_PI, glm::vec3(0.f, 0.f, 1.f));
-  y = glm::scale(y, glm::vec3(3.f, 3.f, 3.f));
-  y = glm::translate(y, glm::vec3(0.f, 0.f, 0.1f * sinf(t)));
-  rs->setModelLocal(y);
+  // glm::mat4 y(1.0);
+  // //y = glm::rotate(y, (float)M_PI, glm::vec3(0.f, 0.f, 1.f));
+  // y = glm::scale(y, glm::vec3(3.f, 3.f, 3.f));
+  // y = glm::translate(y, glm::vec3(0.f, 0.f, 0.1f * sinf(t)));
+  // rs->setModelLocal(y);
 
-  // Render
-  rs->bindMesh(mining_cog_mesh);
-  rs->bindMeshElement(mining_cog_mesh, 0);
-  rs->drawMesh();
-
-
+  // // Render
+  // rs->bindMesh(mining_cog_mesh);
+  // rs->bindMeshElement(mining_cog_mesh, 0);
+  // rs->drawMesh();
 }

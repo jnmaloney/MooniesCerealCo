@@ -17,7 +17,7 @@ ResourceManager& gs_resourceManager();
 
 namespace 
 {
-RenderSystem* g_rs = gs_renderSystem();
+RenderSystem* const g_rs = gs_renderSystem();
 WindowManager& g_windowManager = gs_windowManager();
 MenuManager& g_menuManager = gs_menuManager();
 ResourceManager& g_rm = gs_resourceManager();
