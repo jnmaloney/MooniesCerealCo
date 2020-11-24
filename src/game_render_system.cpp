@@ -16,11 +16,21 @@
 #include "mining_scene.h"
 
 
+using namespace game_globals;
+
+
 namespace game_render_system
 {
   
 void loop()
 {
+  // Logic stuff
+  g_gameData.processing.tick();
+  g_gameData.mining.tick();
+  //g_gameData.launches.loop();
+
+
+  // Render stuff
   g_rs->m_window.width = 1280;
   g_rs->m_window.height = 800;
 

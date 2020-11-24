@@ -7,6 +7,7 @@
 //#include "launch_scene.h"
 #include "dialog_manager.h"
 
+using namespace game_globals;
 
 static DialogManager s_dialogManager;
 
@@ -187,32 +188,34 @@ void econ_page()
 
   ImGui::SetCursorPosX(750);
   ImGui::SetCursorPosY(8);
-  // ImGui::PlotLines("##Income", cash, IM_ARRAYSIZE(cash), 0, "Income", -1.0f, 1.0f, ImVec2(340, 280.0f));
-  if (g_gameData.plot_a_x.size())
+
+  if (g_gameData.day_data.size())
   {
     ImGuiIO& io = ImGui::GetIO();
 
+    // Plot Cash
+
     {
-      const auto& v = g_gameData.plot_a_x;
-      const auto [min, max] = std::minmax_element(begin(v), end(v));
+      const auto& v = g_gameData.day_data;
+      //const auto [min, max] = std::minmax_element(begin(v), end(v));
 
       ImGui::PushFont(io.Fonts->Fonts[2]);
-      if (g_gameData.plot_data_cursor < g_gameData.plot_a_x.size())
+      if (g_gameData.plot_data_cursor < g_gameData.day_data.size())
       {
         ImPlot::SetNextPlotLimits(
-          g_gameData.plot_a_y[g_gameData.plot_data_cursor] - 6, 
-          g_gameData.plot_a_y[g_gameData.plot_data_cursor], 
-          *min - 1000, 
-          *max + 1000, 
+          g_gameData.day_data[g_gameData.plot_data_cursor].week - 6, 
+          g_gameData.day_data[g_gameData.plot_data_cursor].week, 
+          0, 
+          100000, 
           ImGuiCond_Always);
       }
       else
       {
         ImPlot::SetNextPlotLimits(
-          g_gameData.plot_a_y[g_gameData.plot_data_cursor - 1] - 6, 
-          g_gameData.plot_a_y[g_gameData.plot_data_cursor - 1], 
-          *min - 1000, 
-          *max + 1000, 
+          g_gameData.day_data[g_gameData.plot_data_cursor - 1].week - 6, 
+          g_gameData.day_data[g_gameData.plot_data_cursor - 1].week, 
+          0, 
+          100000, 
           ImGuiCond_Always);
       }
       ImPlot::BeginPlot(
@@ -225,47 +228,51 @@ void econ_page()
         ImPlotAxisFlags_NoGridLines
         );    
       ImPlot::PlotLine("##Income", 
-        g_gameData.plot_a_y.data(), 
-        g_gameData.plot_a_x.data(), 
-        g_gameData.plot_a_x.size(),
-        g_gameData.plot_data_cursor + 1);
+        g_gameData.plot_a.data(), 
+        (float*)g_gameData.day_data.data(), 
+        g_gameData.day_data.size(),
+        g_gameData.plot_data_cursor + 1,
+        sizeof(DayData));
       ImPlot::PlotScatter("##Income", 
-        g_gameData.plot_a_y.data(), 
-        g_gameData.plot_a_x.data(), 
-        g_gameData.plot_a_x.size(),
-        g_gameData.plot_data_cursor);
+        g_gameData.plot_a.data(), 
+        (float*)g_gameData.day_data.data(), 
+        g_gameData.day_data.size(),
+        g_gameData.plot_data_cursor,
+        sizeof(DayData));
       ImPlot::EndPlot();
       ImGui::PopFont();
     }
   }
       
+  // Plot Rocks
+
   ImGui::SetCursorPosX(750);
   ImGui::SetCursorPosY((g_windowManager.height - 2 * 84) / 2);     
 
-  if (g_gameData.plot_b_x.size())
+  if (g_gameData.day_data.size())
   {
     ImGuiIO& io = ImGui::GetIO();
     {
-      const auto& v = g_gameData.plot_b_x;
-      const auto [min, max] = std::minmax_element(begin(v), end(v));
+      const auto& v = g_gameData.day_data;
+      //const auto [min, max] = std::minmax_element(begin(v), end(v));
 
       ImGui::PushFont(io.Fonts->Fonts[2]);
-      if (g_gameData.plot_data_cursor < g_gameData.plot_b_x.size())
+      if (g_gameData.plot_data_cursor < g_gameData.day_data.size())
       {
         ImPlot::SetNextPlotLimits(
-          g_gameData.plot_b_y[g_gameData.plot_data_cursor] - 6, 
-          g_gameData.plot_b_y[g_gameData.plot_data_cursor], 
-          *min - 1, 
-          *max + 1, 
+          g_gameData.day_data[g_gameData.plot_data_cursor].week - 6, 
+          g_gameData.day_data[g_gameData.plot_data_cursor].week, 
+          0, 
+          10000, 
           ImGuiCond_Always);
       }
       else
       {
         ImPlot::SetNextPlotLimits(
-          g_gameData.plot_b_y[g_gameData.plot_data_cursor - 1] - 6, 
-          g_gameData.plot_b_y[g_gameData.plot_data_cursor - 1], 
-          *min - 1, 
-          *max + 1, 
+          g_gameData.day_data[g_gameData.plot_data_cursor - 1].week - 6, 
+          g_gameData.day_data[g_gameData.plot_data_cursor - 1].week, 
+          0, 
+          10000, 
           ImGuiCond_Always);
       }
       ImPlot::BeginPlot(
@@ -278,15 +285,17 @@ void econ_page()
         ImPlotAxisFlags_NoGridLines
         );    
       ImPlot::PlotLine("##Income", 
-        g_gameData.plot_b_y.data(), 
-        g_gameData.plot_b_x.data(), 
-        g_gameData.plot_b_x.size(),
-        g_gameData.plot_data_cursor + 1);
+        g_gameData.plot_a.data(), 
+        (float*)g_gameData.day_data.data(), 
+        g_gameData.day_data.size(),
+        g_gameData.plot_data_cursor + 1,
+        sizeof(DayData));
       ImPlot::PlotScatter("##Income", 
-        g_gameData.plot_b_y.data(), 
-        g_gameData.plot_b_x.data(), 
-        g_gameData.plot_b_x.size(),
-        g_gameData.plot_data_cursor);
+        g_gameData.plot_a.data(), 
+        (float*)g_gameData.day_data.data(), 
+        g_gameData.day_data.size(),
+        g_gameData.plot_data_cursor,
+        sizeof(DayData));
       ImPlot::EndPlot();
       ImGui::PopFont();
     }

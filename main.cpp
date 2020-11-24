@@ -152,8 +152,8 @@ int main(int argc, char** argv)
   g_rm.start_async_load();
 
   // Initialiser (game)
-  g_gameData.fleet.push_back(Ship((ShipData){ 3.4f, 2000, 18000, 0 }));
-
+  set_up_game();
+  
   #ifdef __EMSCRIPTEN__
   emscripten_set_main_loop(game_render_system::loop, 0, 1);
   #endif

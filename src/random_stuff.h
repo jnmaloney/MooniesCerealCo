@@ -68,7 +68,7 @@ void sell_puffs()
 
 
 int* g_current_ship_slot;
-Ship* g_current_ship = 0;
+game_globals::Ship* g_current_ship = 0;
 void upgrade_ship(int upgrade, int cost)
 {
   //g_gameData.current_week_data.spent += cost;
@@ -102,10 +102,10 @@ void upgrade_ship(int upgrade, int cost)
 
 
 // ??
-void process_launch(Ship& i)
+void process_launch(game_globals::Ship& i)
 {
   g_gameData.launches.push_back(
-          (Launch){ i, i.order, g_gameData.time, g_gameData.time + i.data.transit_time, g_gameData.time + 2 * i.data.transit_time, false, false }
+          (game_globals::Launch){ i, i.order, g_gameData.time, g_gameData.time + i.data.transit_time, g_gameData.time + 2 * i.data.transit_time, false, false }
         );
   g_gameData.current_week_data.spent += i.data.value; // ?? launch_cost
   i.data.location = 1;  
