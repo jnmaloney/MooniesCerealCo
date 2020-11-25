@@ -150,7 +150,7 @@ static PAGES&                             get_page();
 class GameData
 {
 public:
-  GameData();
+  //GameData();
 
  // Resources
  int                      cash;
@@ -196,7 +196,7 @@ public:
 } // namespace
 
 
-extern game_globals::GameData& g_gameData;
+inline game_globals::GameData g_gameData;
 
 // std::vector<WeekData>&    g_econ_history          = SecretFunctions::get_econ_history();
 // WeekData&                 g_current_week_data     = SecretFunctions::get_current_week_data();

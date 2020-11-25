@@ -33,13 +33,17 @@ void loop()
   // Render stuff
   g_rs->m_window.width = 1280;
   g_rs->m_window.height = 800;
+  g_windowManager.width = 1280;
+  g_windowManager.height = 800;
 
   g_gameData.update_timer();
 
   ImGuiIO& io = ImGui::GetIO();
 
+  //printf("loop\n");
+
   g_rs->start();
-  //printf("rs: 0x%x\n", (size_t)g_rs);
+  // //printf("rs: 0x%x\n", (size_t)g_rs);
 
   if (g_gameData.page == Launchpad)
   {
@@ -269,19 +273,6 @@ void loop()
   ImGui::End();
 
   g_menuManager.postdraw();
-
-    if (g_gameData.page == Launchpad)
-  {
-    draw_launch_scene(g_rs);
-  }
-  else if (g_gameData.page == Processing)
-  {
-    draw_processing_scene(g_rs);
-  }
-  else if (g_gameData.page == Mining)
-  {
-    draw_mining_scene(g_rs);
-  }
 
   g_rs->end();
 }

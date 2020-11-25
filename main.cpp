@@ -137,7 +137,7 @@ int main(int argc, char** argv)
 
   // - Audio - 
 
-  //
+  
   glm::vec3 eye = 15.f * glm::vec3(1, 1, 0.45);
   glm::vec3 centre(0, 0, 0);
   glm::vec3 up(0, 0, 1);

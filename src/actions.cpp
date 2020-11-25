@@ -21,11 +21,15 @@ using namespace game_globals;
 
 void set_up_game()
 {
+  printf("Setting up game...\n");
+
   // processing room
   g_gameData.processing.conveyors.push_back((Conveyor){ 0, 1, 1.0f });
 
-  // Starting ship
-  g_gameData.fleet.push_back(Ship((ShipData){ 3.4f, 2000, 18000, 0 }));
+  // // Starting ship
+  // g_gameData.fleet.push_back(Ship((ShipData){ 3.4f, 2000, 18000, 0 }));
+
+  printf("Finished setting up game.\n");
 }
 
 

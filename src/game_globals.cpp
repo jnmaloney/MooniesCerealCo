@@ -6,14 +6,14 @@ namespace game_globals {
 
 
 // extern global instance
-static GameData hidden_gamedata;
-GameData& g_gameData = hidden_gamedata;
+// static GameData hidden_gamedata = GameData();
+// GameData& g_gameData = hidden_gamedata;
 
-GameData::GameData()  
-//   day_data( { DayData() } ),
-//   current_day_data( day_data.back() )
-{
-}
+// GameData::GameData()  
+// //   day_data( { DayData() } ),
+// //   current_day_data( day_data.back() )
+// {
+// }
 
     static float next_day_counter = 1.0f;
 
@@ -30,8 +30,11 @@ void GameData::day_snapshot()
 
   void GameData::update_timer()
   {
-
+    // printf("update_timer\n");
+    // printf("days: %f\n", days);
+    // printf("timer_speed: %f\n", timer_speed);
     days += timer_speed * (1.0/30.);
+    // printf("days: %f\n", days);
     if (days >= 7.0f)
     {
       day_snapshot();

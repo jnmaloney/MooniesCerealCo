@@ -7,12 +7,13 @@
 static WindowManager s_windowManager;
 static MenuManager s_menuManager;
 static ResourceManager s_resourceManager;
-static RenderSystem s_renderSystem; // after window manager
+static RenderSystem* s_renderSystem = 0; // after window manager
 
 
 RenderSystem* gs_renderSystem()
 {
-  return &s_renderSystem;
+  if (s_renderSystem == 0) s_renderSystem = new RenderSystem();
+  return s_renderSystem;
 }
 
 
