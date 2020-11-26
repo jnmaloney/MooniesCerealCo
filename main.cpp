@@ -136,6 +136,7 @@ int main(int argc, char** argv)
   }
 
   // - Audio - 
+  //g_rm.addResource("soundtrack",  "resources/audio/moonies_theme_loop.ogg", ResourceManager::OGG);
 
   
   glm::vec3 eye = 15.f * glm::vec3(1, 1, 0.45);

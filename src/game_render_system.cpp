@@ -248,7 +248,7 @@ void loop()
   else if (g_gameData.page == Processing)
   {
     drawHeaderBar();
-    drawContent(NULL);
+    drawContent(&production_page);
     drawFooterBar();
   } 
   else if (g_gameData.page == Econ)

@@ -30,3 +30,4 @@ bool no_dialog();
 void draw_mainmenu();
 
 void mining_page();
+void production_page();

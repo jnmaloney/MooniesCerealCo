@@ -6,6 +6,8 @@
 #include "palette.h"
 //#include "launch_scene.h"
 #include "dialog_manager.h"
+#include "actions.h"
+
 
 using namespace game_globals;
 
@@ -133,7 +135,12 @@ void drawBackBar(PAGES page)
 
 void econ_page()
 {  
+  ImGuiIO& io = ImGui::GetIO();
   ImGui::SetCursorPosY(0);
+  ImGui::PushFont(io.Fonts->Fonts[2]);
+  ImGui::TextUnformatted("week");
+      ImGui::Text("");
+      ImGui::Text("");
   ImGui::TextUnformatted("moon rocks collected");
       ImGui::Text("");
       ImGui::Text("");
@@ -146,57 +153,60 @@ void econ_page()
   ImGui::Text("spent");
       ImGui::Text("");
       ImGui::Text("");
-  ImGui::Text("sales");
+  ImGui::TextUnformatted("sales");
+      ImGui::Text("");
+      ImGui::Text("");      
+  ImGui::Text("cash");
 
   float cash[4];
   float stock[4];
-  for (int i = 0; i < 4; ++i)
+  float di = 0;
+  for (auto& i : g_gameData.econ_history)
   {
     ImGui::SetCursorPosY(16);
-    if (i < g_gameData.econ_history.size())
-    {
-      int dx = 120;
-      ImGui::Text("");
-      ImGui::SetCursorPosX(i * 160 + dx);
-      ImGui::Text("%i", g_gameData.econ_history[i].moon_rocks_collected);
-      ImGui::Text("");
-      ImGui::Text("");
-      ImGui::SetCursorPosX(i * 160 + dx);
-      ImGui::Text("%i", g_gameData.econ_history[i].moon_rocks_total);
-      ImGui::Text("");
-      ImGui::Text("");
-      ImGui::SetCursorPosX(i * 160 + dx);
-      ImGui::Text("%i", g_gameData.econ_history[i].processing_rate);
-      ImGui::Text("");
-      ImGui::Text("");
-      ImGui::SetCursorPosX(i * 160 + dx);
-      ImGui::Text("$%i", g_gameData.econ_history[i].spent);
-      ImGui::Text("");
-      ImGui::Text("");
-      ImGui::SetCursorPosX(i * 160 + dx);
-      ImGui::Text("$%i", g_gameData.econ_history[i].sales);
 
-      cash[3 - i] = g_gameData.econ_history[i].sales;
-      stock[3 - i] = g_gameData.econ_history[i].moon_rocks_total;
-    }
-    else
-    {
-      cash[3 - i] = 39000;
-      stock[3 - i] = 0;
-    }
+      int dx = 60;      
+      ImGui::Text("");
+      ImGui::SetCursorPosX(di + dx);
+      ImGui::Text("%i", i.week + 1);
+      ImGui::Text("");
+      ImGui::Text("");
+      ImGui::SetCursorPosX(di + dx);
+      ImGui::Text("$%i", i.moon_rocks_collected);
+      ImGui::Text("");
+      ImGui::Text("");
+      ImGui::SetCursorPosX(di + dx);
+      ImGui::Text("%i", i.moon_rocks_total);
+      ImGui::Text("");
+      ImGui::Text("");
+      ImGui::SetCursorPosX(di + dx);
+      ImGui::Text("%i", i.processing_rate);
+      ImGui::Text("");
+      ImGui::Text("");
+      ImGui::SetCursorPosX(di + dx);
+      ImGui::Text("$%i", i.spent);
+      ImGui::Text("");
+      ImGui::Text("");
+      ImGui::SetCursorPosX(di + dx);
+      ImGui::Text("$%i", i.sales);
+      ImGui::Text("");
+      ImGui::Text("");
+      ImGui::SetCursorPosX(di + dx);
+      ImGui::Text("$%i", i.cash);
+    di += 130.f;
   }
+  ImGui::PopFont();
 
   ImGui::SetCursorPosX(750);
   ImGui::SetCursorPosY(8);
 
   if (g_gameData.day_data.size())
   {
-    ImGuiIO& io = ImGui::GetIO();
 
     // Plot Cash
 
     {
-      const auto& v = g_gameData.day_data;
+      //const auto& v = g_gameData.day_data;
       //const auto [min, max] = std::minmax_element(begin(v), end(v));
 
       ImGui::PushFont(io.Fonts->Fonts[2]);
@@ -205,17 +215,17 @@ void econ_page()
         ImPlot::SetNextPlotLimits(
           g_gameData.day_data[g_gameData.plot_data_cursor].week - 6, 
           g_gameData.day_data[g_gameData.plot_data_cursor].week, 
-          0, 
-          100000, 
+          -1, 
+          10009, 
           ImGuiCond_Always);
       }
       else
       {
         ImPlot::SetNextPlotLimits(
-          g_gameData.day_data[g_gameData.plot_data_cursor - 1].week - 6, 
-          g_gameData.day_data[g_gameData.plot_data_cursor - 1].week, 
-          0, 
-          100000, 
+          g_gameData.day_data[g_gameData.plot_data_cursor + 1].week - 6, 
+          g_gameData.day_data[g_gameData.plot_data_cursor + 1].week, 
+          -1, 
+          10009, 
           ImGuiCond_Always);
       }
       ImPlot::BeginPlot(
@@ -228,16 +238,16 @@ void econ_page()
         ImPlotAxisFlags_NoGridLines
         );    
       ImPlot::PlotLine("##Income", 
-        g_gameData.plot_a.data(), 
-        (float*)g_gameData.day_data.data(), 
+        &g_gameData.day_data[0].week, 
+        &g_gameData.day_data[0].cash_total, 
         g_gameData.day_data.size(),
         g_gameData.plot_data_cursor + 1,
         sizeof(DayData));
-      ImPlot::PlotScatter("##Income", 
-        g_gameData.plot_a.data(), 
-        (float*)g_gameData.day_data.data(), 
+      ImPlot::PlotScatter("##Incomea", 
+        &g_gameData.day_data[0].week, 
+        &g_gameData.day_data[0].cash_total, 
         g_gameData.day_data.size(),
-        g_gameData.plot_data_cursor,
+        g_gameData.plot_data_cursor + 1,
         sizeof(DayData));
       ImPlot::EndPlot();
       ImGui::PopFont();
@@ -253,7 +263,7 @@ void econ_page()
   {
     ImGuiIO& io = ImGui::GetIO();
     {
-      const auto& v = g_gameData.day_data;
+      //const auto& v = g_gameData.day_data;
       //const auto [min, max] = std::minmax_element(begin(v), end(v));
 
       ImGui::PushFont(io.Fonts->Fonts[2]);
@@ -262,8 +272,8 @@ void econ_page()
         ImPlot::SetNextPlotLimits(
           g_gameData.day_data[g_gameData.plot_data_cursor].week - 6, 
           g_gameData.day_data[g_gameData.plot_data_cursor].week, 
-          0, 
-          10000, 
+          -1, 
+          15000, 
           ImGuiCond_Always);
       }
       else
@@ -271,8 +281,8 @@ void econ_page()
         ImPlot::SetNextPlotLimits(
           g_gameData.day_data[g_gameData.plot_data_cursor - 1].week - 6, 
           g_gameData.day_data[g_gameData.plot_data_cursor - 1].week, 
-          0, 
-          10000, 
+          -1, 
+          15000, 
           ImGuiCond_Always);
       }
       ImPlot::BeginPlot(
@@ -284,17 +294,17 @@ void econ_page()
         ImPlotAxisFlags_Lock,
         ImPlotAxisFlags_NoGridLines
         );    
-      ImPlot::PlotLine("##Income", 
-        g_gameData.plot_a.data(), 
-        (float*)g_gameData.day_data.data(), 
+      ImPlot::PlotLine("##Incomeff", 
+        &g_gameData.day_data[0].week, 
+        &g_gameData.day_data[0].rock_total, 
         g_gameData.day_data.size(),
         g_gameData.plot_data_cursor + 1,
         sizeof(DayData));
-      ImPlot::PlotScatter("##Income", 
-        g_gameData.plot_a.data(), 
-        (float*)g_gameData.day_data.data(), 
+      ImPlot::PlotScatter("##Incomefffdd", 
+        &g_gameData.day_data[0].week, 
+        &g_gameData.day_data[0].rock_total, 
         g_gameData.day_data.size(),
-        g_gameData.plot_data_cursor,
+        g_gameData.plot_data_cursor + 1,
         sizeof(DayData));
       ImPlot::EndPlot();
       ImGui::PopFont();
@@ -649,4 +659,20 @@ void draw_mainmenu()
 void mining_page()
 {
   // not here... draw_mining_scene(g_rs);
+}
+
+
+void production_page()
+{
+  if (ImGui::Button("Buy New Machine"))
+  {
+    buy_new_machine();
+  }
+
+  if (ImGui::Button("Upgrade..."))
+  {
+    // ...
+  }
+
+  ImGui::Text("Would you like to know more?");
 }

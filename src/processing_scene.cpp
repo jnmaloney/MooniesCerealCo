@@ -15,6 +15,9 @@ public:
   void draw(RenderSystem* rs);
 
 protected:
+  
+  void draw_conveyor(RenderSystem* rs, glm::mat4 x, game_globals::Conveyor& conveyor_object);
+
   bool is_init = false;
   Mesh* conveyor_mesh;
   Mesh* conveyor_belt_mesh;
@@ -61,13 +64,24 @@ void ProcessingScene::draw(RenderSystem* rs)
   // Some gl setting
   glActiveTexture(GL_TEXTURE0);
 
+  glm::mat4 x(1.0);
+  x = glm::translate(x, glm::vec3(9.f, 0.f, -2.5f));
+  for (auto& i : g_gameData.processing.conveyors)
+  {
+    draw_conveyor(rs, x, i);
+    x = glm::translate(x, glm::vec3(-8.f, 0.f, 0.f));
+  }
+}
+
+
+void ProcessingScene::draw_conveyor(RenderSystem* rs, glm::mat4 t, game_globals::Conveyor& conveyor_object)
+{
+  // Set local
+  glm::mat4 x = glm::rotate(t, (float)M_PI, glm::vec3(0.f, 0.f, 1.f));
+  rs->setModelLocal(x);
+
   // Conveyor
   glBindTexture(GL_TEXTURE_2D, conveyor_texture[0]);
-
-  // Set local
-  glm::mat4 x(1.0);
-  x = glm::rotate(x, (float)M_PI, glm::vec3(0.f, 0.f, 1.f));
-  rs->setModelLocal(x);
 
   // Render
   g_rs->bindMesh(conveyor_mesh);
@@ -78,12 +92,11 @@ void ProcessingScene::draw(RenderSystem* rs)
   }
 
   // Belt
-  static float s_scroll = 0.f;
-  s_scroll = fmod(s_scroll + 0.10/60.f, 1.f);
-
   // rs->m_shaderManager.setShader("Scrolling");
-  // rs->m_shaderManager.update(rs);
-  rs->m_shaderManager.setParam("Scrolling", "scroll", s_scroll);
+  bool scrolling = conveyor_object.timings.size() || conveyor_object.stock;
+  float scroll_amount = scrolling ? 0.5 * 1.0f/60.0f : 0.0f;
+  conveyor_object.scroll = fmod(scroll_amount + conveyor_object.scroll, 1.0f);
+  rs->m_shaderManager.setParam("Scrolling", "scroll", conveyor_object.scroll);
 
   rs->bindMesh(conveyor_belt_mesh);
 
@@ -102,19 +115,25 @@ void ProcessingScene::draw(RenderSystem* rs)
   // Stuff on the conveyor belt
   // (1, 9) -> (1, -4)
 
-  static float f = 13.0f / 3.0f;
-  static float offset = 0.f;
-  offset = fmod(offset + 0.10/60.0 * 2.0f, f);
+  static float f = 13.0f;
+  //static float offset = 0.f;
+  //offset = fmod(offset + 0.10/60.0 * 2.0f, f);
 
   rs->bindMesh(stuff);
   rs->bindMeshElement(stuff, 0);
 
-  for (int i = 0; i < 3; ++i)
+  //for (int i = 0; i < conveyor_object.timings.size(); ++i)
+  for (auto& i : conveyor_object.timings)
   {
-    glm::mat4 x(1.0);
-    x = glm::translate(x, glm::vec3(0.f, -9.0f + i * f + offset, 1.5f));
-    x = glm::rotate(x, (float)M_PI*0.5f, glm::vec3(0.f, 1.f, 0.f));
-    rs->setModelLocal(x);
+    glm::mat4 y(t);
+
+    //printf("%.1f\n", ((float)i - (float)g_gameData.time_tick));
+    
+    float offset = 4.f - f * ((float)i - (float)g_gameData.time_tick) / (float)conveyor_object.conveying_time;
+    y = glm::translate(y, glm::vec3(0.f, offset, 1.5f));
+    
+    y = glm::rotate(y, (float)M_PI*0.5f, glm::vec3(0.f, 1.f, 0.f));
+    rs->setModelLocal(y);
  
     rs->drawMesh();
   }

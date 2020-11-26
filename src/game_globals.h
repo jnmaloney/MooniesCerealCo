@@ -23,23 +23,27 @@ namespace game_globals
 
 struct WeekData
 {
+  int week;
   int moon_rocks_collected;
   int moon_rocks_total;
   int moon_rock_storage_cap;
   int processing_rate;
   int spent;
   int sales;
+  int cash;
 };
 struct DayData
 {
-  int day;
-  float week;
-  int cash_in;
-  int cash_out;
-  int cash_flow;
-  int rock_in;
-  int rock_out;
-  int rock_flow;
+  float day = 0;
+  float week = 0;
+  float cash_in = 0;
+  float cash_out = 0;
+  float cash_flow = 0;
+  float cash_total = 0;
+  float rock_in = 0;
+  float rock_out = 0;
+  float rock_flow = 0;
+  float rock_total = 0;
 };
 
 
@@ -80,7 +84,11 @@ struct Conveyor
   int stock;
   int type;
   float health;
-  std::vector<int> timings;
+  float scroll;
+  int process_timer = 0; 
+  int processing_time = 232;
+  int conveying_time = 600;
+  std::deque<int> timings;
   void tick();
 };
 struct ProcessingRoom
@@ -150,14 +158,13 @@ static PAGES&                             get_page();
 class GameData
 {
 public:
-  //GameData();
+  GameData();
 
  // Resources
  int                      cash;
- int                      rock;
+ int                      rock = 1500;
  float                    fuel;
  WeekData                 current_week_data;
- DayData                 current_day_data;
  std::vector<Ship>        fleet;
  std::vector<Launch>      launches;
 
@@ -167,18 +174,20 @@ public:
  //
 
   // Resource history
- std::vector<WeekData>    econ_history;
+ std::deque<WeekData>    econ_history;
 
  // Timer
  int                      week_counter = 0;
- float                    time = 0.f;
+ int                      time_tick = 0;
+ //float                    time = 0.f;
  // new
  float                    days = 0.f;
  float                    timer_speed = 1.0f;
 
  // Plots data
- std::vector<DayData> day_data;
- std::vector<float> plot_a; 
+ std::vector<DayData>     day_data;
+ //DayData                  dummy_day_data;
+ //DayData&                 current_day_data;
 //  std::vector<float> plot_a_x; 
 //  std::vector<float> plot_a_y; 
 //  std::vector<float> plot_b_x; 
@@ -196,7 +205,7 @@ public:
 } // namespace
 
 
-inline game_globals::GameData g_gameData;
+inline game_globals::GameData g_gameData = game_globals::GameData();
 
 // std::vector<WeekData>&    g_econ_history          = SecretFunctions::get_econ_history();
 // WeekData&                 g_current_week_data     = SecretFunctions::get_current_week_data();

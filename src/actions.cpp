@@ -24,10 +24,11 @@ void set_up_game()
   printf("Setting up game...\n");
 
   // processing room
-  g_gameData.processing.conveyors.push_back((Conveyor){ 0, 1, 1.0f });
+  //g_gameData.processing.conveyors.push_back((Conveyor){ 0, 1, 1.0f });
+  g_gameData.processing.conveyors.push_back(Conveyor());
 
   // // Starting ship
-  // g_gameData.fleet.push_back(Ship((ShipData){ 3.4f, 2000, 18000, 0 }));
+  g_gameData.fleet.push_back(Ship((ShipData){ 3.4f, 2000, 18000, 0 }));
 
   printf("Finished setting up game.\n");
 }
@@ -56,76 +57,65 @@ void end_week()
   // TIME-FRAME NOW ADVENCES
   //
   g_gameData.week_counter += 1;
-  g_gameData.time += 7.0f * (float)g_gameData.week_counter;
+  //g_gameData.time += 7.0f * (float)g_gameData.week_counter;
 
   // Do all pickup orders in next time frame
-  for (auto& i : g_gameData.launches)
-  {
-    if (!i.picked_up && i.time_of_pickup <= g_gameData.time)
-    {
-      pickup_cargo(i.order);
-      i.picked_up = true;
-      i.ship.data.location = 2;
-    }
-  }
+  // for (auto& i : g_gameData.launches)
+  // {
+  //   if (!i.picked_up && i.time_of_pickup <= g_gameData.time)
+  //   {
+  //     pickup_cargo(i.order);
+  //     i.picked_up = true;
+  //     i.ship.data.location = 2;
+  //   }
+  // }
 
   // Do all cargo returns in next time frame
-  for (auto& i : g_gameData.launches)
-  {
-    if (!i.returned && i.time_of_return <= g_gameData.time)
-    {
-      return_cargo(i.order);
-      i.returned = true;
-      i.ship.data.location = 0;
+  // for (auto& i : g_gameData.launches)
+  // {
+  //   if (!i.returned && i.time_of_return <= g_gameData.time)
+  //   {
+  //     return_cargo(i.order);
+  //     i.returned = true;
+  //     i.ship.data.location = 0;
       
-      if (i.ship.order.repeat)
-      {
-        // i.returned = false;
-        // process_launch(i.ship);
-      }
-      else 
-      {
-        i.ship.order = nil_order; // ?
-      }
-    }
-  }
-  g_gameData.launches.erase(std::remove_if(
-                                  g_gameData.launches.begin(),
-                                  g_gameData.launches.end(),
-                                  [](std::vector<Launch>::value_type const& elem) 
-                                  {
-                                    return elem.returned;
-                                  }),
-                                  g_gameData.launches.end());
+  //     if (i.ship.order.repeat)
+  //     {
+  //       // i.returned = false;
+  //       // process_launch(i.ship);
+  //     }
+  //     else 
+  //     {
+  //       i.ship.order = nil_order; // ?
+  //     }
+  //   }
+  // }
+  // g_gameData.launches.erase(std::remove_if(
+  //                                 g_gameData.launches.begin(),
+  //                                 g_gameData.launches.end(),
+  //                                 [](std::vector<Launch>::value_type const& elem) 
+  //                                 {
+  //                                   return elem.returned;
+  //                                 }),
+  //                                 g_gameData.launches.end());
 
   // Apply collection
   g_gameData.current_week_data.moon_rocks_total += g_gameData.current_week_data.moon_rocks_collected;
 
-  // Apply cash
-  g_gameData.cash -= g_gameData.current_week_data.spent; 
-  g_gameData.cash += g_gameData.current_week_data.sales;
-
-  // Done
+  // Add history values  
   g_gameData.econ_history.push_back(g_gameData.current_week_data);
+  if (g_gameData.econ_history.size() > 5) g_gameData.econ_history.pop_front();
+
   g_gameData.current_week_data = {
+    g_gameData.week_counter,
     0,
     g_gameData.current_week_data.moon_rocks_total,
     11,
     0,
     0,
-    0,
+    0,   
+    g_gameData.cash 
   };
-}
-
-
-void day_event()
-{
-
-  // Process moon rocks into moon puffs
-  process_puffs();
-
-  // Sell moon puffs
-  sell_puffs();
 }
 
 
@@ -147,6 +137,8 @@ void collect_rock(int x)
 {
   g_gameData.rock += x;
   g_gameData.current_week_data.moon_rocks_collected += x;
+  g_gameData.day_data[g_gameData.plot_data_cursor].rock_flow += x;
+  g_gameData.day_data[g_gameData.plot_data_cursor].rock_in += x;
 }
 
 
@@ -154,6 +146,8 @@ void consume_rock(int x)
 {
   g_gameData.rock -= x;
   //g_gameData.current_week_data.spent += x;
+  g_gameData.day_data[g_gameData.plot_data_cursor].rock_flow -= x;
+  g_gameData.day_data[g_gameData.plot_data_cursor].rock_out += x;
 }
 
 
@@ -162,6 +156,8 @@ void sell_unit()
   int x = 5;
   g_gameData.cash += x;
   g_gameData.current_week_data.sales += x;
+  g_gameData.day_data[g_gameData.plot_data_cursor].cash_flow += x;
+  g_gameData.day_data[g_gameData.plot_data_cursor].cash_in += x;
 }
 
 
@@ -217,4 +213,14 @@ bool ship_unload_rock(Ship & ship)
 {
   ship.data.location = 1;
   return true;
+}
+
+
+void buy_new_machine()
+{
+  // Spending
+
+  // Creating
+  g_gameData.processing.conveyors.push_back((Conveyor){ 0, 1, 1.0f });
+
 }
