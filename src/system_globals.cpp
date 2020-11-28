@@ -8,6 +8,7 @@ static WindowManager s_windowManager;
 static MenuManager s_menuManager;
 static ResourceManager s_resourceManager;
 static RenderSystem* s_renderSystem = 0; // after window manager
+static AudioManager s_audioManager; // after window manager
 
 
 RenderSystem* gs_renderSystem()
@@ -32,6 +33,12 @@ ResourceManager& gs_resourceManager()
 {
   return s_resourceManager;
 }
+
+AudioManager& gs_audioManager()
+{
+  return s_audioManager;
+}
+
 
 
 std::string ZeroPadNumber(int num)

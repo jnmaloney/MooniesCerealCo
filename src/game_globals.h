@@ -59,7 +59,7 @@ static Order nil_order = (Order){ 0, 0, 0 };
 struct ShipData
 {
   float transit_time;
-  int filled;
+  //  int filled;
   int capacity;
   int value;
   int location;
@@ -70,10 +70,13 @@ struct Ship
   ShipData data;
   Order order = nil_order;
   boost::uuids::uuid tag;// = boost::uuids::random_generator()();
+
+  // Upgrades
   int slot1 = 0;
   int slot2 = 0;
   int slot3 = 0;
-  int delay; // order time
+  
+  int delay; // order time  
 };
 //struct LaunchPad
 //{};

@@ -24,6 +24,9 @@ namespace game_render_system
   
 void loop()
 {
+  // Audio
+  g_audioManager.tick();
+
   // Logic stuff
   g_gameData.processing.tick();
   g_gameData.mining.tick();

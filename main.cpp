@@ -136,7 +136,7 @@ int main(int argc, char** argv)
   }
 
   // - Audio - 
-  //g_rm.addResource("soundtrack",  "resources/audio/moonies_theme_loop.ogg", ResourceManager::OGG);
+  g_rm.addResource("soundtrack",  "resources/audio/moonies_theme_loop.ogg", ResourceManager::OGG);
 
   
   glm::vec3 eye = 15.f * glm::vec3(1, 1, 0.45);
@@ -154,6 +154,8 @@ int main(int argc, char** argv)
 
   // Initialiser (game)
   set_up_game();
+
+  g_audioManager.init();
   
   #ifdef __EMSCRIPTEN__
   emscripten_set_main_loop(game_render_system::loop, 0, 1);

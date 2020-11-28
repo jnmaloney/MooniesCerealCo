@@ -28,7 +28,7 @@ void set_up_game()
   g_gameData.processing.conveyors.push_back(Conveyor());
 
   // // Starting ship
-  g_gameData.fleet.push_back(Ship((ShipData){ 3.4f, 2000, 18000, 0 }));
+  g_gameData.fleet.push_back(Ship((ShipData){ 3.4f, 800, 12800, 0 }));
 
   printf("Finished setting up game.\n");
 }
@@ -167,11 +167,12 @@ bool ship_launch(Ship & ship)
   float fuel = 1.0f;
   float fuel_available = 2.0f;
 
-  if (fuel > fuel_available)
+  if (fuel <= fuel_available)
   {
     // do it!
     spend_fuel(fuel);
     //ship.data.delay = time + 200;
+    ship.delay = g_gameData.time_tick + 220;
     ship.data.location = 2;
     return true;
   }
@@ -182,17 +183,20 @@ bool ship_launch(Ship & ship)
 bool ship_collect_rock(Ship & ship)
 {
   // calculate purchase price
-  int cost = 101;
+  int cost = 1;// 101;
   
   // can pay the price?
   if (g_gameData.cash > cost)
   {
+    printf("collecting\n");
     ship.data.location = 3;
 
     // do it!
-    g_gameData.cash -= cost;
-    ship.data.filled = 2;
-    ship.order.cost = 0;
+    spend_cash(cost);
+    // ship.data.filled = 2;
+    // ship.order.cost = 0;
+
+    ship.delay = g_gameData.time_tick + 20;
   }
 
   return false;
@@ -202,9 +206,9 @@ bool ship_collect_rock(Ship & ship)
 bool ship_return(Ship & ship)
 {
   ship.data.location = 4;
-  collect_rock(ship.data.filled);
-  ship.data.filled = 0;
+  //ship.data.filled = 0;
   //ship.data.delay = time + 200;
+  ship.delay = g_gameData.time_tick + 220;
   return true;
 }
 
@@ -212,6 +216,9 @@ bool ship_return(Ship & ship)
 bool ship_unload_rock(Ship & ship)
 {
   ship.data.location = 1;
+  printf("unloading\n");
+  collect_rock(ship.data.capacity);
+  ship.delay = g_gameData.time_tick + 30;
   return true;
 }
 

@@ -56,14 +56,16 @@ void drawHeaderBar()
     true, 
     ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);   
   
+  ImGui::SetCursorPosX(12);
+
   ImGui::Text("$%i", g_gameData.cash);
 
   ImGui::SetCursorPosX(g_windowManager.width / 2 - 140);
   ImGui::SetCursorPosY(0);
-  ImGui::Text("Rocks %i/%i", 0, 0); //g_current_week_data.moon_rocks_total, g_current_week_data.moon_rock_storage_cap);
+  ImGui::Text("Rocks %i/%i", g_gameData.rock, 0); //g_current_week_data.moon_rocks_total, g_current_week_data.moon_rock_storage_cap);
 
   const char* label = "Moonies Cereal Co";
-  ImGui::SetCursorPosX(g_windowManager.width - ImGui::CalcTextSize(label).x - 8);
+  ImGui::SetCursorPosX(g_windowManager.width - ImGui::CalcTextSize(label).x - 12);
   ImGui::SetCursorPosY(0);
   ImGui::Text("%s", label);
 
@@ -422,11 +424,11 @@ void launch_page()
   // Fleet list
   //ImGui::Text("Fleet");
     
-  ImGui::BeginChild(
-    "Fleet_container_child", 
-    ImVec2(0, 480), 
-    true, 
-    0);  
+  // ImGui::BeginChild(
+  //   "Fleet_container_child", 
+  //   ImVec2(0, 480), 
+  //   true, 
+  //   0);  
 
   static bool toggle_button = false;
   static Ship* which_order;
@@ -529,11 +531,15 @@ void launch_page()
     // else
     //   ImGui::Text("In Transit...");
     if (i.data.location == 0)   
-      ImGui::Text("Ready");
+      ImGui::Text("No orders");
     else if (i.data.location == 1)   
+      ImGui::Text("On Launchpad");
+    else if (i.data.location == 2)   
       ImGui::Text("Going up");
-    else if (i.data.location == 2)
-      ImGui::Text("Return");
+    else if (i.data.location == 3)
+      ImGui::Text("Collecting from moon mine");
+    else if (i.data.location == 4)
+      ImGui::Text("Returning");
     else
       ImGui::Text("Something...");      
     ImGui::EndChild();
@@ -581,7 +587,7 @@ void launch_page()
 
     ImGui::EndChild(); // Fleet item
   }
-  ImGui::EndChild(); // Fleet container
+  //ImGui::EndChild(); // Fleet container
 
   // Popups
     if (toggle_button)
@@ -613,6 +619,7 @@ void launch_page()
       {
         toggle_button = false;
         which_order->order = (Order){ 1, which_order->data.capacity, 1, s_repeat };
+        which_order->delay = g_gameData.time_tick + 1;
       }       
 
       if (ImGui::Button("Do nothing"))

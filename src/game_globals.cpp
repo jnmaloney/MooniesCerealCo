@@ -57,8 +57,10 @@ void GameData::day_snapshot()
 
 void GameData::update_timer()
 {
+  // Global frame counter
   time_tick += 1;
 
+  // Stats update
   day_data[plot_data_cursor].cash_total = cash;
   day_data[plot_data_cursor].rock_total = rock;
   
@@ -82,6 +84,24 @@ void GameData::update_timer()
     days = next_day_counter;
     next_day_counter += 1.0f;
   }
+
+  // Update fleets... (new)
+  for (auto& i : g_gameData.fleet)
+  {
+    if (g_gameData.time_tick >= i.delay)
+    {
+      if (i.data.location == 1) ship_launch(i);
+      else if (i.data.location == 2) ship_collect_rock(i);
+      else if (i.data.location == 3) ship_return(i);
+      else if (i.data.location == 4) ship_unload_rock(i);
+      else
+      {
+        // printf("launching a nyway\n");
+        // ship_launch(i);
+      }
+    }
+
+  }
 }
 
 
@@ -95,6 +115,7 @@ void Mine::tick()
 {
   // Add rock to stock
 }
+
 
 void ProcessingRoom::tick()
 {
@@ -127,8 +148,7 @@ void Conveyor::tick()
   else
   {
     process_timer += 1;
-  }
-  
+  }  
 }
 
 
