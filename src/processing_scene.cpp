@@ -18,14 +18,16 @@ protected:
   
   void draw_conveyor(RenderSystem* rs, glm::mat4 x, game_globals::Conveyor& conveyor_object);
   void draw_floor(RenderSystem* rs, glm::mat4 x);
+  void draw_pile(glm::mat4 x, Mesh* pile_verts);
 
   bool is_init = false;
   Mesh* conveyor_mesh;
   Mesh* conveyor_belt_mesh;
   Mesh* conveyor_load_mesh;
   Mesh* conveyor_floor_mesh;
+  Mesh* pile;
   Mesh* stuff;
-  unsigned int conveyor_texture[6];
+  unsigned int conveyor_texture[7];
 };
 
 
@@ -47,6 +49,7 @@ bool ProcessingScene::init()
   g_rm.getResource("conveyor belt", (void**)&conveyor_belt_mesh);
   g_rm.getResource("conveyor load", (void**)&conveyor_load_mesh);
   g_rm.getResource("conveyor floor", (void**)&conveyor_floor_mesh);
+  g_rm.getResource("pile", (void**)&pile);
   g_rm.getResource("square", (void**)&stuff);
 
   g_rm.getResource("conveyor body(tex)", conveyor_texture[0]);
@@ -55,6 +58,7 @@ bool ProcessingScene::init()
   g_rm.getResource("conveyor load(tex)", conveyor_texture[3]);
   g_rm.getResource("conveyor floor 1(tex)", conveyor_texture[4]);
   g_rm.getResource("conveyor floor 2(tex)", conveyor_texture[5]);
+  g_rm.getResource("puff", conveyor_texture[6]);
 
   is_init = true;
   return true;
@@ -92,14 +96,14 @@ void ProcessingScene::draw(RenderSystem* rs)
 
 void ProcessingScene::draw_floor(RenderSystem* rs, glm::mat4 t)
 {
-  // Set local
-  glm::mat4 x = glm::rotate(t, (float)M_PI, glm::vec3(0.f, 0.f, 1.f));
-  rs->setModelLocal(x);
+  // // Set local
+  // glm::mat4 x = glm::rotate(t, (float)M_PI, glm::vec3(0.f, 0.f, 1.f));
+  // rs->setModelLocal(x);
 
-  glBindTexture(GL_TEXTURE_2D, conveyor_texture[4]);
-  g_rs->bindMesh(conveyor_floor_mesh);
-  g_rs->bindMeshElement(conveyor_floor_mesh, 0);
-  g_rs->drawMesh();
+  // glBindTexture(GL_TEXTURE_2D, conveyor_texture[4]);
+  // g_rs->bindMesh(conveyor_floor_mesh);
+  // g_rs->bindMeshElement(conveyor_floor_mesh, 0);
+  // g_rs->drawMesh();
 }
 
 
@@ -109,11 +113,11 @@ void ProcessingScene::draw_conveyor(RenderSystem* rs, glm::mat4 t, game_globals:
   glm::mat4 x = glm::rotate(t, (float)M_PI, glm::vec3(0.f, 0.f, 1.f));
   rs->setModelLocal(x);
 
-  // Floor
-  glBindTexture(GL_TEXTURE_2D, conveyor_texture[5]);
-  g_rs->bindMesh(conveyor_floor_mesh);
-  g_rs->bindMeshElement(conveyor_floor_mesh, 0);
-  g_rs->drawMesh();
+  // // Floor
+  // glBindTexture(GL_TEXTURE_2D, conveyor_texture[5]);
+  // g_rs->bindMesh(conveyor_floor_mesh);
+  // g_rs->bindMeshElement(conveyor_floor_mesh, 0);
+  // g_rs->drawMesh();
 
   // Conveyor
   glBindTexture(GL_TEXTURE_2D, conveyor_texture[0]);
@@ -156,21 +160,39 @@ void ProcessingScene::draw_conveyor(RenderSystem* rs, glm::mat4 t, game_globals:
 
   rs->bindMesh(stuff);
   rs->bindMeshElement(stuff, 0);
+  glBindTexture(GL_TEXTURE_2D, conveyor_texture[6]);
 
   //for (int i = 0; i < conveyor_object.timings.size(); ++i)
   for (auto& i : conveyor_object.timings)
   {
-    glm::mat4 y(t);
+    // glm::mat4 y(cameraView);
+    // y[3].x = t[3].x;
+    // y[3].y = t[3].y;
+    // y[3].z = t[3].z;
 
-    //printf("%.1f\n", ((float)i - (float)g_gameData.time_tick));
+    glm::mat4 y(t);
     
     float offset = 4.f - f * ((float)i - (float)g_gameData.time_tick) / (float)conveyor_object.conveying_time;
-    y = glm::translate(y, glm::vec3(0.f, offset, 1.5f));
-    
-    y = glm::rotate(y, (float)M_PI*0.5f, glm::vec3(0.f, 1.f, 0.f));
-    rs->setModelLocal(y);
- 
-    //rs->drawMesh();
-    //draw_pile(y, pile_mesh)
+    //y = glm::translate(y, glm::vec3(0.f, offset, 1.5f));
+    y = glm::translate(y, glm::vec3(0.f, offset, 2.0f));
+
+    draw_pile(y, pile);
+  }
+}
+
+
+void ProcessingScene::draw_pile(glm::mat4 x, Mesh* pile_verts)
+{
+  //printf("%i\n", pile_verts->m_vertP.size());
+  for (auto& i : pile_verts->m_obj_vertices)
+  {
+    glm::mat4 y = glm::translate(x, 0.8f * glm::vec3(i));
+    y = glm::rotate(y, 0.25f * (float)M_PI, glm::vec3(0.f, 0.f, 1.f));
+    y = glm::rotate(y, 0.5f * (float)M_PI, glm::vec3(0.f, 1.f, 0.f));
+    y = glm::scale(y, glm::vec3(0.2f));
+    g_rs->setModelLocal(y);
+    g_rs->bindMesh(stuff);
+    g_rs->bindMeshElement(stuff, 0);
+    g_rs->drawMesh();
   }
 }

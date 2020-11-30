@@ -140,6 +140,9 @@ void ProcessingRoom::tick()
 
 void Conveyor::tick()
 {
+  //
+  // Processing...
+  //
   for (int i = 0; i < timings.size(); ++i)
   {
     if (g_gameData.time_tick >= timings[i])
@@ -149,7 +152,23 @@ void Conveyor::tick()
     }
   }
 
+  //
+  // Damage...
+  //
+  if (health <= 0)
+  {
+    return;
+  }
+  else
+  {
+    float ticks_per_day = 600.f;
+    float tick_lifetime = ticks_per_day * 7.0f * 5.0f;
+    health -= 1.0f / tick_lifetime;
+  }
+  
+  //
   // Timing for production
+  //
   if (process_timer >= processing_time)
   {
     // Stock for prodution

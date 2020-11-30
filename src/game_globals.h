@@ -164,7 +164,7 @@ public:
   GameData();
 
  // Resources
- int                      cash;
+ int                      cash = 160;
  int                      rock = 1500;
  float                    fuel;
  WeekData                 current_week_data;

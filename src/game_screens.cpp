@@ -142,7 +142,7 @@ void drawHeaderBar()
   ImGui::SetCursorPosY(cursor_pos_y);
 
   ImGui::AlignTextToFramePadding();
-  //ImGui::Text("$%i", g_gameData.cash);
+  ImGui::Text("$%i", g_gameData.cash);
 
   ImGui::SameLine();
   ImGui::SetCursorPosX(g_windowManager.width / 2 - 140);
@@ -190,16 +190,16 @@ void drawFooterBar()
   if (im_is_button_disabled()) im_enable_buttons();
   ImGui::SameLine();
 
+  if (g_gameData.page == Processing) im_disable_buttons();
+  if (ImGui::Button("Processing")) g_gameData.page = Processing;
+  if (im_is_button_disabled()) im_enable_buttons();
+  ImGui::SameLine();
+
   if (g_gameData.page == Launchpad) im_disable_buttons();
   int i = 0;
   //for (auto& j : g_fleet) if (j.data.location == 0 && j.order.pickup_amount == 0) ++i;
   std::string name = std::string("(") + std::to_string(i) + std::string(") Launchpad");
   if (ImGui::Button(name.c_str())) g_gameData.page = Launchpad;
-  if (im_is_button_disabled()) im_enable_buttons();
-  ImGui::SameLine();
-
-  if (g_gameData.page == Processing) im_disable_buttons();
-  if (ImGui::Button("Processing")) g_gameData.page = Processing;
   if (im_is_button_disabled()) im_enable_buttons();
   ImGui::SameLine();
 
@@ -781,17 +781,73 @@ void mining_page()
 
 void production_page()
 {
-  if (ImGui::Button("Buy New Machine"))
+  // if (ImGui::Button("Upgrade..."))
+  // {
+  //   // ...
+  // }
+
+  //ImGui::Text("Would you like to know more?");
+
+  for (auto& i: g_gameData.processing.conveyors)
   {
-    buy_new_machine();
+    ImGui::ProgressBar(i.health, ImVec2(264, 0), "Health");    
+    if (i.health < 0.51)
+    {
+      ImGui::SameLine();
+      bool disable = g_gameData.cash < 200;
+      if (disable) im_disable_buttons();
+      std::string text = "Repair ($200)";
+      text += "##" + std::to_string((unsigned long)&i);
+      if (ImGui::Button(text.c_str()))
+      {
+        spend_cash(200);
+        i.health = 1.0f;
+      }
+      if (disable) im_enable_buttons();
+    }
   }
 
-  if (ImGui::Button("Upgrade..."))
+  static bool toggle_button = false;
+
+  if (g_gameData.processing.conveyors.size() < 4)
   {
-    // ...
+    if (ImGui::Button("Buy New Machine"))
+    {
+      toggle_button = true;
+    }
   }
 
-  ImGui::Text("Would you like to know more?");
+  if (toggle_button)
+  {
+    ImGui::OpenPopup("Buy new machine");
+  }
+  else
+  {
+    ImGui::CloseCurrentPopup();
+  }
+  
+  if (ImGui::BeginPopupModal("Buy new machine", &toggle_button, ImGuiWindowFlags_AlwaysAutoResize))
+  {
+    int cost = 4600;
+
+    ImGui::Text("Buy new machine for $%i", cost);
+    
+    bool disable = g_gameData.cash < cost;
+    if (disable) im_disable_buttons();
+    if (ImGui::Button("Buy"))
+    {
+      buy_new_machine();
+    }        
+    if (disable) im_enable_buttons();
+
+    if (ImGui::Button("Cancel"))
+    {
+      toggle_button = false;
+    }
+
+
+    ImGui::EndPopup();
+  }
 }
 
 

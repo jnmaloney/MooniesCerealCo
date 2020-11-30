@@ -170,10 +170,10 @@ bool ship_unload_rock(Ship & ship)
 void buy_new_machine()
 {
   // Spending
+  spend_cash(4600);
 
   // Creating
   g_gameData.processing.conveyors.push_back((Conveyor){ 0, 1, 1.0f });
-
 }
 
 
