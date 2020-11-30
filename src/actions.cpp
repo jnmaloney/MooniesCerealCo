@@ -231,3 +231,22 @@ void buy_new_machine()
   g_gameData.processing.conveyors.push_back((Conveyor){ 0, 1, 1.0f });
 
 }
+
+
+bool s_show_credits = false;
+void show_game_credits()
+{
+  s_show_credits = true;
+}
+
+
+void hide_game_credits()
+{
+  s_show_credits = false;
+}
+
+
+bool showing_game_credits()
+{
+  return s_show_credits;
+}

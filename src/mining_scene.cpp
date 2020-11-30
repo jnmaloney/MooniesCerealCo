@@ -17,8 +17,9 @@ public:
 protected:
   bool is_init = false;
   Mesh* mining_mesh;
-  Mesh* mining_cog_mesh;
+  Mesh* energy_mesh;
   unsigned int mining_texture;
+  unsigned int energy_texture;
 };
 
 
@@ -37,11 +38,10 @@ bool MiningScene::init()
   if (is_init) return true;
 
   g_rm.getResource("mining body", (void**)&mining_mesh);
-  // g_rm.getResource("mining cog", (void**)&mining_cog_mesh);
-  // inspect(mining_mesh);
-  // inspect(mining_cog_mesh);
+  g_rm.getResource("mining energy", (void**)&energy_mesh);
 
   g_rm.getResource("mining body(tex)", mining_texture);
+  g_rm.getResource("mining energy(tex)", energy_texture);
 
   is_init = true;
   return true;
@@ -81,4 +81,18 @@ void MiningScene::draw(RenderSystem* rs)
   // rs->bindMesh(mining_cog_mesh);
   // rs->bindMeshElement(mining_cog_mesh, 0);
   // rs->drawMesh();
+
+  glBindTexture(GL_TEXTURE_2D, energy_texture);
+
+  // Set local
+  glm::mat4 y(1.0);
+  y = glm::translate(y,  glm::vec3(-14.f, 4.f, -1.f));
+  y = glm::scale(y, glm::vec3(1.5f, 1.5f, 1.5f));
+  y = glm::rotate(y, (float)M_PI, glm::vec3(0.f, 0.f, 1.f));
+  rs->setModelLocal(y);
+
+  // Render
+  rs->bindMesh(energy_mesh);
+  rs->bindMeshElement(energy_mesh, 0);
+  rs->drawMesh();
 }

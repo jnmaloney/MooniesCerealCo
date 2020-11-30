@@ -14,6 +14,17 @@
 #include "game_render_system.h"
 
 
+bool fullscreen_callback(int eventType, const EmscriptenFullscreenChangeEvent *fullscreenChangeEvent, void *userData)
+{
+  g_windowManager.width = fullscreenChangeEvent->elementWidth;
+  g_windowManager.height = fullscreenChangeEvent->elementHeight;
+
+  // glfwSetWindowSize(g_windowManager.g_window, g_windowManager.width, g_windowManager.height);
+
+  return true;
+}
+
+
 //extern "C" 
 int main(int argc, char** argv)
 {
@@ -82,9 +93,12 @@ int main(int argc, char** argv)
 
   // ImPlot
   ImPlot::CreateContext();
-  ImPlot::GetStyle().LineWeight = 8.0f;
+  ImPlot::GetStyle().LineWeight = 11.0f;
+  ImPlot::GetStyle().MarkerSize = 5.0f;
+  ImPlot::GetStyle().MarkerWeight = 0.0f;
   ImPlot::GetStyle().AntiAliasedLines = true;
-  ImPlot::GetStyle().Colors[ImPlotCol_Line] = ImColor(g_palette["indigo_200"]);
+  //ImPlot::GetStyle().Colors[ImPlotCol_Line] = ImColor(g_palette["indigo_200"]);
+  ImPlot::GetStyle().Colors[ImPlotCol_Line] = ImColor(0xffd5c99f);
 
   // Resources (async loading)
 
@@ -126,6 +140,8 @@ int main(int argc, char** argv)
 
   g_rm.addResource("mining body",       "resources/objects/mining/safe_miner_singleobject.obj", ResourceManager::OBJ);
   g_rm.addResource("mining body(tex)",  "resources/objects/mining/texture_11 some bake.png", ResourceManager::PNG);
+  g_rm.addResource("mining energy",       "resources/objects/mining/energy/energy_station2 modified.obj", ResourceManager::OBJ);
+  g_rm.addResource("mining energy(tex)",  "resources/objects/mining/energy/texture_11_energy.png", ResourceManager::PNG);
 
   // Particles
   for (int i = 0; i < 25; ++i)
@@ -154,6 +170,9 @@ int main(int argc, char** argv)
 
   // Initialiser (game)
   set_up_game();
+
+  // Fullscreen callback
+  //emscripten_set_fullscreenchange_callback("canvas", (void*)NULL, true, (em_fullscreenchange_callback_func)&fullscreen_callback);
 
   g_audioManager.init();
   

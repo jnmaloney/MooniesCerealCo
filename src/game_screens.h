@@ -15,6 +15,8 @@ enum PAGES
 };
 
 
+void draw_game_credits();
+
 void drawHeaderBar();
 
 void drawFooterBar();

@@ -94,9 +94,13 @@ void LaunchScene::draw(RenderSystem* rs)
   // Rockets
   float rocket_height = 0;
   // if (g_gameData.days > 3.5)
-  if (g_gameData.fleet[0].order.pickup_amount > 0) // && !g_gameData.fleet[0].data.location)
+  if (g_gameData.fleet[0].data.location == 2)
   {
     rocket_height = 2.0;
+  }
+  else if (g_gameData.fleet[0].data.location > 2)
+  {
+    rocket_height = 15.0;
   }
 
       // Set local
@@ -115,7 +119,7 @@ void LaunchScene::draw(RenderSystem* rs)
 
   // Smoke
   glDepthMask(false);
-  if (g_gameData.fleet[0].order.pickup_amount > 0)
+  if (g_gameData.fleet[0].data.location == 2)
   {
     for (int i = 0; i < 25; ++i)
     {

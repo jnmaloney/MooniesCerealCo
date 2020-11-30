@@ -15,6 +15,18 @@
 #include "processing_scene.h"
 #include "mining_scene.h"
 
+#ifdef __EMSCRIPTEN__ // resize
+#include <emscripten.h>
+#include <emscripten/html5.h>
+#endif
+ 
+// EM_JS(int, canvas_get_width, (), {
+//   return Module.canvas.clientWidth;
+// });
+
+// EM_JS(int, canvas_get_height, (), {
+//   return Module.canvas.clientHeight;
+// });
 
 using namespace game_globals;
 
@@ -24,6 +36,16 @@ namespace game_render_system
   
 void loop()
 {
+  // Window
+  // g_windowManager.width = canvas_get_width();
+  // g_windowManager.height = canvas_get_height();
+  // g_rs->m_window.width = g_windowManager.width;
+  // g_rs->m_window.height = g_windowManager.height;
+  //glfwSetWindowSize(g_windowManager.g_window, g_windowManager.width, g_windowManager.height);
+  // int width = canvas_get_width();
+  // int height = canvas_get_height();
+  // glfwSetWindowSize(g_rs->m_window.g_window, g_windowManager.width, g_windowManager.height);
+
   // Audio
   g_audioManager.tick();
 
@@ -32,18 +54,17 @@ void loop()
   g_gameData.mining.tick();
   //g_gameData.launches.loop();
 
-
-  // Render stuff
-  g_rs->m_window.width = 1280;
-  g_rs->m_window.height = 800;
-  g_windowManager.width = 1280;
-  g_windowManager.height = 800;
-
   g_gameData.update_timer();
 
   ImGuiIO& io = ImGui::GetIO();
 
   //printf("loop\n");
+
+  // // Render stuff
+  g_rs->m_window.width = 1280;
+  g_rs->m_window.height = 800;
+  g_windowManager.width = 1280;
+  g_windowManager.height = 800;
 
   g_rs->start();
   // //printf("rs: 0x%x\n", (size_t)g_rs);
@@ -62,6 +83,11 @@ void loop()
   }
 
   g_menuManager.predraw();
+
+  //   ImGui::Text("%i", g_windowManager.g_window);
+  // ImGui::Text("%i", g_rs->m_window.g_window);
+  // ImGui::Text("w  %i", g_windowManager.width);
+  // ImGui::Text("h  %i", g_windowManager.height);
   
   static int FULL_SCREEN_FLAGS = ImGuiWindowFlags_NoTitleBar | 
                           ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
@@ -271,6 +297,11 @@ void loop()
   if (g_gameData.page != MainMenu)  
   {
     draw_dialog();  
+  }
+
+  if (showing_game_credits())
+  {
+    draw_game_credits();
   }
   
   ImGui::End();

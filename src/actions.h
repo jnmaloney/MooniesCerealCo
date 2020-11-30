@@ -4,6 +4,12 @@
 #include "game_globals.h"
 
 
+// Game actions
+void show_game_credits();
+void hide_game_credits();
+bool showing_game_credits();
+
+
 void set_up_game();
 
 

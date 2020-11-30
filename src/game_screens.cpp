@@ -7,11 +7,92 @@
 //#include "launch_scene.h"
 #include "dialog_manager.h"
 #include "actions.h"
-
+#ifdef __EMSCRIPTEN__ // game credits
+#include <emscripten.h>
+#include <emscripten/html5.h>
+#endif
 
 using namespace game_globals;
 
 static DialogManager s_dialogManager;
+
+
+EM_JS(void, open_tab_url, (const char* str), {
+  //console.log('hello ' + UTF8ToString(str));
+  var win = window.open(UTF8ToString(str), '_blank');
+  win.focus();
+});
+
+
+void draw_game_credits()
+{
+  // Fade game screen
+  // const ImU32 dim_bg_col = ImColor(1.f, 1.f, 1.f, 0.25f);
+  // ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(0, 0), ImVec2(g_windowManager.width, g_windowManager.height), dim_bg_col);
+
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 12.f);
+  //ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.25, 0.25, 0.25, 1));
+
+  // Window
+  int w = 520;
+  int h = 300;
+  ImGui::SetNextWindowPos(ImVec2(
+     0.5 * (g_windowManager.width - w), 
+     0.5 * (g_windowManager.height - h) ));
+  //if (ImGui::BeginChild("Made by##credits", ImVec2(w, h), true, ImGuiWindowFlags_None))
+  bool a = true;
+  ImGui::SetNextWindowSize(ImVec2(w, h));
+  //if (ImGui::Begin("Made by##credits", &a, ImGuiWindowFlags_NoDecoration))
+  if (ImGui::BeginPopupModal("Made by##credits", &a, ImGuiWindowFlags_NoDecoration))
+  {
+    ImGui::Separator();
+    ImGui::Text("Created for Game Off 2020 by");
+    ImGui::Separator();
+
+    ImGui::SetCursorPosY(125); 
+
+    ImGui::AlignTextToFramePadding();
+    ImGui::Text("Programming ");
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(w - 305); 
+    if (ImGui::Button("meatpudding", ImVec2(295, 0)))
+    {
+      open_tab_url("https://jnmaloney.itch.io/");
+    }
+    ImGui::AlignTextToFramePadding();
+    ImGui::Text("Art ");
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(w - 305); 
+    if (ImGui::Button("cokyfish", ImVec2(295, 0)))
+    {
+      open_tab_url("https://cokyfish.itch.io/");
+    }
+    ImGui::AlignTextToFramePadding();
+    ImGui::Text("Music");
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(w - 305); 
+    if (ImGui::Button("mit-mit", ImVec2(295, 0)))
+    {
+      open_tab_url("https://soundcloud.com/user-349094787");
+    }
+    ImGui::EndPopup();
+    //ImGui::End();
+    //ImGui::EndChild();
+  }
+  ImGui::OpenPopup("Made by##credits");
+
+  ImGui::PopStyleVar();
+  //ImGui::PopStyleColor();
+
+  if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) | ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+  {
+    //if (!ImGui::IsAnyWindowHovered())
+    if (!ImGui::IsAnyItemHovered())
+    {
+      hide_game_credits();
+    }
+  }
+}
 
 
   static bool inited = false;
@@ -40,34 +121,51 @@ void drawHeaderBar()
 {
   ImGui::GetWindowDrawList()->AddRectFilled(
     ImVec2(0, 0), 
-    ImVec2(g_windowManager.width, 63), 
+    ImVec2(g_windowManager.width, 62), 
     IM_COL32(0x43, 0x47, 0xA0, 255),//g_palette["indigo_600"], 
     0.0f,
     ImDrawCornerFlags_None);
   ImGui::GetWindowDrawList()->AddLine(
     ImVec2(0, 66), 
-    ImVec2(g_windowManager.width, 66), 
+    ImVec2(g_windowManager.width, 64), 
     IM_COL32(0x2E, 0x32, 0x7D, 255),//g_palette["indigo_800"], 
     8.0f);
 
   ImGui::BeginChild(
     "Header", 
-    ImVec2(0, 70), 
+    ImVec2(0, 68), 
     true, 
     ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);   
   
+  int cursor_pos_y = 8;
   ImGui::SetCursorPosX(12);
+  ImGui::SetCursorPosY(cursor_pos_y);
 
-  ImGui::Text("$%i", g_gameData.cash);
+  ImGui::AlignTextToFramePadding();
+  //ImGui::Text("$%i", g_gameData.cash);
 
+  ImGui::SameLine();
   ImGui::SetCursorPosX(g_windowManager.width / 2 - 140);
-  ImGui::SetCursorPosY(0);
-  ImGui::Text("Rocks %i/%i", g_gameData.rock, 0); //g_current_week_data.moon_rocks_total, g_current_week_data.moon_rock_storage_cap);
+  //ImGui::SetCursorPosY(cursor_pos_y);
+  ImGui::Text("Rocks %i/%i", g_gameData.rock, 0); //g_current_week_data.moon_rock_storage_cap);
+
+  // Moonies icon
+  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
+  ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
+  ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 0));
 
   const char* label = "Moonies Cereal Co";
-  ImGui::SetCursorPosX(g_windowManager.width - ImGui::CalcTextSize(label).x - 12);
-  ImGui::SetCursorPosY(0);
-  ImGui::Text("%s", label);
+  ImGui::SameLine();
+  ImGui::SetCursorPosX(g_windowManager.width - ImGui::CalcTextSize(label).x - 36);
+  //ImGui::SetCursorPosX(g_windowManager.width - ImGui::CalcTextSize(label).x - 12);
+  //ImGui::SetCursorPosY(cursor_pos_y);
+  if (ImGui::Button(label))
+  {
+    show_game_credits();
+  }
+
+  ImGui::PopStyleColor(4);
 
   ImGui::EndChild();
 }
@@ -143,20 +241,26 @@ void econ_page()
   ImGui::TextUnformatted("week");
       ImGui::Text("");
       ImGui::Text("");
+      ImGui::Text("");
   ImGui::TextUnformatted("moon rocks collected");
+      ImGui::Text("");
       ImGui::Text("");
       ImGui::Text("");
   ImGui::Text("moon rocks total");
       ImGui::Text("");
       ImGui::Text("");
+      ImGui::Text("");
   ImGui::Text("processed");
+      ImGui::Text("");
       ImGui::Text("");
       ImGui::Text("");
   ImGui::Text("spent");
       ImGui::Text("");
       ImGui::Text("");
+      ImGui::Text("");
   ImGui::TextUnformatted("sales");
       ImGui::Text("");
+      ImGui::Text("");      
       ImGui::Text("");      
   ImGui::Text("cash");
 
@@ -173,24 +277,30 @@ void econ_page()
       ImGui::Text("%i", i.week + 1);
       ImGui::Text("");
       ImGui::Text("");
+      ImGui::Text("");
       ImGui::SetCursorPosX(di + dx);
-      ImGui::Text("$%i", i.moon_rocks_collected);
+      ImGui::Text("%i", i.moon_rocks_collected);
+      ImGui::Text("");
       ImGui::Text("");
       ImGui::Text("");
       ImGui::SetCursorPosX(di + dx);
       ImGui::Text("%i", i.moon_rocks_total);
       ImGui::Text("");
       ImGui::Text("");
+      ImGui::Text("");
       ImGui::SetCursorPosX(di + dx);
       ImGui::Text("%i", i.processing_rate);
+      ImGui::Text("");
       ImGui::Text("");
       ImGui::Text("");
       ImGui::SetCursorPosX(di + dx);
       ImGui::Text("$%i", i.spent);
       ImGui::Text("");
       ImGui::Text("");
+      ImGui::Text("");
       ImGui::SetCursorPosX(di + dx);
       ImGui::Text("$%i", i.sales);
+      ImGui::Text("");
       ImGui::Text("");
       ImGui::Text("");
       ImGui::SetCursorPosX(di + dx);
