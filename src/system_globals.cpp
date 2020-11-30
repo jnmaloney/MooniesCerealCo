@@ -40,7 +40,6 @@ AudioManager& gs_audioManager()
 }
 
 
-
 std::string ZeroPadNumber(int num)
 {
     std::ostringstream ss;

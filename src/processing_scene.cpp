@@ -17,12 +17,15 @@ public:
 protected:
   
   void draw_conveyor(RenderSystem* rs, glm::mat4 x, game_globals::Conveyor& conveyor_object);
+  void draw_floor(RenderSystem* rs, glm::mat4 x);
 
   bool is_init = false;
   Mesh* conveyor_mesh;
   Mesh* conveyor_belt_mesh;
+  Mesh* conveyor_load_mesh;
+  Mesh* conveyor_floor_mesh;
   Mesh* stuff;
-  unsigned int conveyor_texture[3];
+  unsigned int conveyor_texture[6];
 };
 
 
@@ -42,14 +45,16 @@ bool ProcessingScene::init()
 
   g_rm.getResource("conveyor body", (void**)&conveyor_mesh);
   g_rm.getResource("conveyor belt", (void**)&conveyor_belt_mesh);
+  g_rm.getResource("conveyor load", (void**)&conveyor_load_mesh);
+  g_rm.getResource("conveyor floor", (void**)&conveyor_floor_mesh);
   g_rm.getResource("square", (void**)&stuff);
 
   g_rm.getResource("conveyor body(tex)", conveyor_texture[0]);
   g_rm.getResource("conveyor belt(tex)", conveyor_texture[1]);
   g_rm.getResource("conveyor side(tex)", conveyor_texture[2]);
-
-  inspect(conveyor_mesh);
-  inspect(conveyor_belt_mesh);
+  g_rm.getResource("conveyor load(tex)", conveyor_texture[3]);
+  g_rm.getResource("conveyor floor 1(tex)", conveyor_texture[4]);
+  g_rm.getResource("conveyor floor 2(tex)", conveyor_texture[5]);
 
   is_init = true;
   return true;
@@ -64,13 +69,37 @@ void ProcessingScene::draw(RenderSystem* rs)
   // Some gl setting
   glActiveTexture(GL_TEXTURE0);
 
+  // glm::mat4 x(1.0);
+  // x = glm::translate(x, glm::vec3(9.f, 0.f, -2.5f));
+  // for (auto& i : g_gameData.processing.conveyors)
+  // {
+  //   draw_conveyor(rs, x, i);
+  //   x = glm::translate(x, glm::vec3(-8.f, 0.f, 0.f));
+  // }
+
   glm::mat4 x(1.0);
   x = glm::translate(x, glm::vec3(9.f, 0.f, -2.5f));
-  for (auto& i : g_gameData.processing.conveyors)
+  for (int i = 0; i < 4; ++i)
   {
-    draw_conveyor(rs, x, i);
+    if (i < g_gameData.processing.conveyors.size())
+      draw_conveyor(rs, x, g_gameData.processing.conveyors[i]);
+    else
+      draw_floor(rs, x);
     x = glm::translate(x, glm::vec3(-8.f, 0.f, 0.f));
   }
+}
+
+
+void ProcessingScene::draw_floor(RenderSystem* rs, glm::mat4 t)
+{
+  // Set local
+  glm::mat4 x = glm::rotate(t, (float)M_PI, glm::vec3(0.f, 0.f, 1.f));
+  rs->setModelLocal(x);
+
+  glBindTexture(GL_TEXTURE_2D, conveyor_texture[4]);
+  g_rs->bindMesh(conveyor_floor_mesh);
+  g_rs->bindMeshElement(conveyor_floor_mesh, 0);
+  g_rs->drawMesh();
 }
 
 
@@ -79,6 +108,12 @@ void ProcessingScene::draw_conveyor(RenderSystem* rs, glm::mat4 t, game_globals:
   // Set local
   glm::mat4 x = glm::rotate(t, (float)M_PI, glm::vec3(0.f, 0.f, 1.f));
   rs->setModelLocal(x);
+
+  // Floor
+  glBindTexture(GL_TEXTURE_2D, conveyor_texture[5]);
+  g_rs->bindMesh(conveyor_floor_mesh);
+  g_rs->bindMeshElement(conveyor_floor_mesh, 0);
+  g_rs->drawMesh();
 
   // Conveyor
   glBindTexture(GL_TEXTURE_2D, conveyor_texture[0]);
@@ -135,6 +170,7 @@ void ProcessingScene::draw_conveyor(RenderSystem* rs, glm::mat4 t, game_globals:
     y = glm::rotate(y, (float)M_PI*0.5f, glm::vec3(0.f, 1.f, 0.f));
     rs->setModelLocal(y);
  
-    rs->drawMesh();
+    //rs->drawMesh();
+    //draw_pile(y, pile_mesh)
   }
 }

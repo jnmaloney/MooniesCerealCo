@@ -793,3 +793,39 @@ void production_page()
 
   ImGui::Text("Would you like to know more?");
 }
+
+
+void home_page()
+{
+/*
+  ImGui::Text("Home");
+  if (g_gameData.week_counter == 0)
+  {
+    ImGui::Text("Um..");
+    ImGui::Text("Welcome to the cereal factory. It's");
+    ImGui::Text("your first day.");
+    ImGui::Text("Place some orders, before clicking");
+    ImGui::Text("next.");
+  }
+  else
+  {
+    ImGui::Text("Cash: $%i", g_gameData.cash);
+    ImGui::Text("Moon rock collected this week: %i", g_gameData.current_week_data.moon_rocks_collected);
+    ImGui::Text("%i / %i moon rock in storage", g_gameData.current_week_data.moon_rocks_total, g_gameData.current_week_data.moon_rock_storage_cap);
+    ImGui::Text("%i processed to moon puffs this week", g_gameData.current_week_data.processing_rate);
+    ImGui::Text("Spent: $%i", g_gameData.current_week_data.spent);
+    ImGui::Text("Sales: $%i", g_gameData.current_week_data.sales); 
+  }    
+*/
+  // blank if dialogue?
+
+  // text sold this week
+  // text sold last week
+  // text processed this week
+  // rock in storage
+  // text vehicles in use
+  // text mining...
+
+  // text bills outstanding
+
+}

@@ -57,7 +57,6 @@ GameData::GameData() :
 void GameData::day_snapshot()
 {
   int size = (6 * 7 + 1);
-  //printf("current_day_data  %i\n", current_day_data.cash_flow);
   float value_week = (1.0f/7.0f) * ((float)(week_counter * 7) + next_day_counter); // day (week)
 
   if (day_data.size() < size)
@@ -73,19 +72,6 @@ void GameData::day_snapshot()
   day_data[plot_data_cursor].week = value_week;
   day_data[plot_data_cursor].cash_total = cash;
   day_data[plot_data_cursor].rock_total = rock;
-
-  // for (int i = 0; i < 8; ++i)
-  // {
-  //   for (int j = 0; j < (int)day_data.size(); ++j)
-  //   {
-  //     float g = ((float*)day_data.data())[i + j * sizeof(DayData) / sizeof(float)];
-  //     printf("%.1f\t", g);
-  //   }
-  //   printf("\n");
-  // }
-  // printf("\n");
-  
-  //printf("day snp %i,  %f\n", day_data.size(), value_week);
 }
 
 
@@ -98,18 +84,13 @@ void GameData::update_timer()
   day_data[plot_data_cursor].cash_total = cash;
   day_data[plot_data_cursor].rock_total = rock;
   
-  // printf("update_timer\n");
-  // printf("days: %f\n", days);
-  // printf("timer_speed: %f\n", timer_speed);
   days += timer_speed * (1.0/30.);
-  // printf("days: %f\n", days);
   if (days >= 7.0f)
   {
     day_snapshot();
 
     days = 0;
     next_day_counter = 1.0f;
-    //week_counter += 1;
     end_week(); //a c t i o n
   }
   else if (days >= next_day_counter)

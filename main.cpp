@@ -125,11 +125,16 @@ int main(int argc, char** argv)
   g_rm.addResource("Bot(zzz)",      "resources/portrait/bot/zzz.png", ResourceManager::PNG);
 
   // - 3D's -
-  g_rm.addResource("conveyor body",       "resources/objects/conveyor/conveyor bake.obj", ResourceManager::OBJ);
-  g_rm.addResource("conveyor belt",       "resources/objects/conveyor/conveyor belt isolated.obj", ResourceManager::OBJ);
-  g_rm.addResource("conveyor body(tex)",  "resources/objects/conveyor/ao_target.png", ResourceManager::PNG);
-  g_rm.addResource("conveyor belt(tex)",  "resources/objects/conveyor/conveyor_tile.png", ResourceManager::PNG);
-  g_rm.addResource("conveyor side(tex)",  "resources/objects/conveyor/conveyor_side.png", ResourceManager::PNG);
+  g_rm.addResource("conveyor body",       "resources/objects/processing/conveyor/conveyor body b.obj", ResourceManager::OBJ);
+  g_rm.addResource("conveyor load",       "resources/objects/processing/conveyor/conveyor load b.obj", ResourceManager::OBJ);
+  g_rm.addResource("conveyor floor",      "resources/objects/processing/conveyor/conveyor floor b.obj", ResourceManager::OBJ);
+  g_rm.addResource("conveyor belt",       "resources/objects/processing/conveyor/conveyor belt isolated.obj", ResourceManager::OBJ);
+  g_rm.addResource("conveyor body(tex)",  "resources/objects/processing/conveyor/conveyor body.png", ResourceManager::PNG);
+  g_rm.addResource("conveyor load(tex)",  "resources/objects/processing/conveyor/conveyor load b.png", ResourceManager::PNG);
+  g_rm.addResource("conveyor floor 1(tex)",  "resources/objects/processing/conveyor/floor 1.png", ResourceManager::PNG);
+  g_rm.addResource("conveyor floor 2(tex)",  "resources/objects/processing/conveyor/floor 2.png", ResourceManager::PNG);
+  g_rm.addResource("conveyor belt(tex)",  "resources/objects/processing/conveyor/conveyor_tile.png", ResourceManager::PNG);
+  g_rm.addResource("conveyor side(tex)",  "resources/objects/processing/conveyor/conveyor_side.png", ResourceManager::PNG);
 
   g_rm.addResource("rocket",          "resources/objects/rocket/retro toy rocket.obj", ResourceManager::OBJ);
   g_rm.addResource("launch platform", "resources/objects/rocket/launch_platform.obj", ResourceManager::OBJ);

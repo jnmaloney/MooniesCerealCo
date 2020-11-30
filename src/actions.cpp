@@ -24,8 +24,9 @@ void set_up_game()
   printf("Setting up game...\n");
 
   // processing room
-  //g_gameData.processing.conveyors.push_back((Conveyor){ 0, 1, 1.0f });
-  g_gameData.processing.conveyors.push_back(Conveyor());
+  g_gameData.processing.conveyors.push_back((Conveyor){ 0, 1, 1.0f });
+  g_gameData.processing.conveyors.push_back((Conveyor){ 0, 1, 0.0f });
+  //g_gameData.processing.conveyors.push_back(Conveyor());
 
   // // Starting ship
   g_gameData.fleet.push_back(Ship((ShipData){ 3.4f, 800, 12800, 0 }));
@@ -41,46 +42,6 @@ void end_week()
   //
   g_gameData.week_counter += 1;
   //g_gameData.time += 7.0f * (float)g_gameData.week_counter;
-
-  // Do all pickup orders in next time frame
-  // for (auto& i : g_gameData.launches)
-  // {
-  //   if (!i.picked_up && i.time_of_pickup <= g_gameData.time)
-  //   {
-  //     pickup_cargo(i.order);
-  //     i.picked_up = true;
-  //     i.ship.data.location = 2;
-  //   }
-  // }
-
-  // Do all cargo returns in next time frame
-  // for (auto& i : g_gameData.launches)
-  // {
-  //   if (!i.returned && i.time_of_return <= g_gameData.time)
-  //   {
-  //     return_cargo(i.order);
-  //     i.returned = true;
-  //     i.ship.data.location = 0;
-      
-  //     if (i.ship.order.repeat)
-  //     {
-  //       // i.returned = false;
-  //       // process_launch(i.ship);
-  //     }
-  //     else 
-  //     {
-  //       i.ship.order = nil_order; // ?
-  //     }
-  //   }
-  // }
-  // g_gameData.launches.erase(std::remove_if(
-  //                                 g_gameData.launches.begin(),
-  //                                 g_gameData.launches.end(),
-  //                                 [](std::vector<Launch>::value_type const& elem) 
-  //                                 {
-  //                                   return elem.returned;
-  //                                 }),
-  //                                 g_gameData.launches.end());
 
   // Apply collection
   g_gameData.current_week_data.moon_rocks_total += g_gameData.current_week_data.moon_rocks_collected;
