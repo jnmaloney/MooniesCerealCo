@@ -34,25 +34,8 @@ void set_up_game()
 }
 
 
-void pickup_cargo(Order& order)
-{
-  // ?? needs to adjust "cargo in transit"
-  int cost = fulfil(order.pickup_location, order.pickup_amount);
-  g_gameData.current_week_data.spent += cost; 
-}
-
-
-void return_cargo(Order& order)
-{
-  g_gameData.current_week_data.moon_rocks_collected += order.pickup_amount;  
-}
-
-
 void end_week()
 {
-  // Create the order list
-  process_launch_list();
-
   //
   // TIME-FRAME NOW ADVENCES
   //

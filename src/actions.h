@@ -15,15 +15,9 @@ void set_up_game();
 
 void end_week();
 
-int fulfil(int location, int amount);
-void pickup_cargo(game_globals::Order& order);
 //void process_puffs();
 //void sell_puffs();
 void upgrade_ship(int upgrade, int cost);
-void process_launch(game_globals::Ship& i);
-void process_launch_list();
-void pickup_cargo(game_globals::Order& order);
-void return_cargo(game_globals::Order& order);
 
 // common resource actions
 void spend_cash(int x);

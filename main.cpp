@@ -7,9 +7,9 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 #endif
-#include "random_stuff.h"
 #include "system_globals.h"
 #include "game_globals.h"
+#include "actions.h"
 #include "palette.h"
 #include "game_render_system.h"
 

@@ -3,6 +3,40 @@
 #include <algorithm>
 
 
+int* g_current_ship_slot;
+game_globals::Ship* g_current_ship = 0;
+void upgrade_ship(int upgrade, int cost)
+{
+  //g_gameData.current_week_data.spent += cost;
+  g_gameData.cash -= cost;
+
+  *g_current_ship_slot = upgrade;
+
+  if (g_current_ship == 0) return;
+
+  if (upgrade == 1)
+  {
+    g_current_ship->data.value *= 0.9; // ?? launch_cost
+  }
+  if (upgrade == 2)
+  {
+    g_current_ship->data.value *= 0.9; // ?? launch_cost
+  }
+  if (upgrade == 3)
+  {
+    g_current_ship->data.capacity += 500;
+  }
+  if (upgrade == 4)
+  {
+    g_current_ship->data.value *= 0.8; // ?? launch_cost
+  }
+  if (upgrade == 5)
+  {
+
+  }
+}
+
+
 namespace game_globals {
 
 
