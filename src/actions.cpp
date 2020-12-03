@@ -24,12 +24,12 @@ void set_up_game()
   printf("Setting up game...\n");
 
   // processing room
-  g_gameData.processing.conveyors.push_back((Conveyor){ 0, 1, 1.0f });
-  g_gameData.processing.conveyors.push_back((Conveyor){ 0, 1, 0.0f });
-  //g_gameData.processing.conveyors.push_back(Conveyor());
+  g_gameData.processing.conveyors.push_back(std::vector<Conveyor>()); // floor 1
+  g_gameData.processing.conveyors[0].push_back((Conveyor){ 0, 1, 1.0f });
+  g_gameData.processing.conveyors[0].push_back((Conveyor){ 0, 1, 0.0f });
 
-  // // Starting ship
-  g_gameData.fleet.push_back(Ship((ShipData){ 3.4f, 800, 12800, 0 }));
+  // Starting ship
+  g_gameData.fleet.push_back(Ship((ShipData){ 3.4f, 80, 12800, 0 }));
 
   printf("Finished setting up game.\n");
 }
@@ -60,6 +60,24 @@ void end_week()
     0,   
     g_gameData.cash 
   };
+
+  // gameover
+  if (g_gameData.week_counter == 52 && g_gameData.tax_bill)
+  {
+    g_dialogManager.dialog.load("/data/game_lose.dialog");
+    g_gameData.page = Card;
+    g_gameData.game_over = true;
+  }
+
+  // mine bonus
+  if ( g_gameData.mine_miner &&  g_gameData.mine_power &&  g_gameData.mine_silo )
+  {
+    int x = 50000;
+    g_gameData.cash += x;
+    g_gameData.current_week_data.sales += x;
+    g_gameData.day_data[g_gameData.plot_data_cursor].cash_flow += x;
+    g_gameData.day_data[g_gameData.plot_data_cursor].cash_in += x; 
+  }
 }
 
 
@@ -97,7 +115,8 @@ void consume_rock(int x)
 
 void sell_unit()
 {
-  int x = 5;
+  int x = 20 + 10 * g_gameData.science_level;
+  if (g_gameData.week_counter % 4 == 3) x *= 3; // full moon
   g_gameData.cash += x;
   g_gameData.current_week_data.sales += x;
   g_gameData.day_data[g_gameData.plot_data_cursor].cash_flow += x;
@@ -116,7 +135,8 @@ bool ship_launch(Ship & ship)
     // do it!
     spend_fuel(fuel);
     //ship.data.delay = time + 200;
-    ship.delay = g_gameData.time_tick + 220;
+    float delay = ship.data.transit_time * 16.f * 30.f;
+    ship.delay = g_gameData.time_tick + delay;
     ship.data.location = 2;
     return true;
   }
@@ -132,7 +152,6 @@ bool ship_collect_rock(Ship & ship)
   // can pay the price?
   if (g_gameData.cash > cost)
   {
-    printf("collecting\n");
     ship.data.location = 3;
 
     // do it!
@@ -152,28 +171,31 @@ bool ship_return(Ship & ship)
   ship.data.location = 4;
   //ship.data.filled = 0;
   //ship.data.delay = time + 200;
-  ship.delay = g_gameData.time_tick + 220;
+  float delay = ship.data.transit_time * 16.f * 30.f;
+  ship.delay = g_gameData.time_tick + (int)delay;
   return true;
 }
 
 
 bool ship_unload_rock(Ship & ship)
 {
-  ship.data.location = 1;
-  printf("unloading\n");
-  collect_rock(ship.data.capacity);
-  ship.delay = g_gameData.time_tick + 30;
+  if (g_gameData.rock + ship.data.capacity <= 2000)
+  {
+    ship.data.location = 1;
+    collect_rock(ship.data.capacity);
+    ship.delay = g_gameData.time_tick + 30;
+  }
   return true;
 }
 
 
-void buy_new_machine()
+void buy_new_machine(int current_floor)
 {
   // Spending
-  spend_cash(4600);
+  spend_cash(1800);
 
   // Creating
-  g_gameData.processing.conveyors.push_back((Conveyor){ 0, 1, 1.0f });
+  g_gameData.processing.conveyors[current_floor].push_back((Conveyor){ 0, 1, 1.0f });
 }
 
 
@@ -193,4 +215,45 @@ void hide_game_credits()
 bool showing_game_credits()
 {
   return s_show_credits;
+}
+
+
+void buy_new_science(int cost)
+{
+  spend_cash(cost);
+  g_gameData.science_unlock = true;
+  g_gameData.next_science_level = g_gameData.time_tick + 16 * 30 * 7;
+}
+
+
+void upgrade_ship(int upgrade, int cost)
+{
+  //g_gameData.current_week_data.spent += cost;
+  if (g_gameData.cash < cost) return;
+  spend_cash(cost);
+
+  *g_current_ship_slot = upgrade;
+
+  if (g_current_ship == 0) return;
+
+  if (upgrade == 1)
+  {
+    g_current_ship->data.transit_time *= 0.9;
+  }
+  if (upgrade == 2)
+  {
+    g_current_ship->data.transit_time *= 0.9; // ?? launch_cost
+  }
+  if (upgrade == 3)
+  {
+    g_current_ship->data.capacity += 50;
+  }
+  if (upgrade == 4)
+  {
+    g_current_ship->data.transit_time *= 0.8; // ?? launch_cost
+  }
+  if (upgrade == 5)
+  {
+
+  }
 }

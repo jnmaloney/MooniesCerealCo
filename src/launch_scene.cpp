@@ -41,9 +41,9 @@ bool LaunchScene::init()
   Random::init();
 
   unsigned int handle;
-  g_rm.getResource("rocket", handle); rocket_mesh = (Mesh*)handle;
-  g_rm.getResource("launch platform", handle); platform_mesh = (Mesh*)handle;
-  g_rm.getResource("square", handle); square_mesh = (Mesh*)handle;
+  g_rm.getResource("rocket", (void**)&rocket_mesh);
+  g_rm.getResource("launch platform", (void**)&platform_mesh);
+  g_rm.getResource("square", (void**)&square_mesh);
 
   g_rm.getResource("launch_texture", platform_texture);
   g_rm.getResource("mtl1", rocket_texture[0]);
@@ -75,20 +75,20 @@ void LaunchScene::draw(RenderSystem* rs)
   
   // Platforms
   glBindTexture(GL_TEXTURE_2D, platform_texture);
-  for (int i = -1; i < 2; ++i)
+  for (int k = 0; k < 3; ++k)
   {
-    for (int j = 0; j < 2; ++j)
-    {
-      // Set local
-      glm::mat4 x(1.0);
-      x = glm::translate(x, 7.f * glm::vec3(-1.15*(i-j), -1.15*-i, 0));
-      rs->setModelLocal(x);
+    int i = k / 2;
+    int j = k % 2;
+  
+    // Set local
+    glm::mat4 x(1.0);
+    x = glm::translate(x, 7.f * glm::vec3(-1.15*i, 1.15*j, 0));
+    rs->setModelLocal(x);
 
-      // Render
-      rs->bindMesh(platform_mesh);
-      rs->bindMeshElement(platform_mesh, 0);
-      rs->drawMesh();
-    }
+    // Render
+    rs->bindMesh(platform_mesh);
+    rs->bindMeshElement(platform_mesh, 0);
+    rs->drawMesh();
   }
 
   // Rockets

@@ -5,7 +5,6 @@
 #include "implot.h"
 #include "palette.h"
 //#include "launch_scene.h"
-#include "dialog_manager.h"
 #include "actions.h"
 #ifdef __EMSCRIPTEN__ // game credits
 #include <emscripten.h>
@@ -14,13 +13,11 @@
 
 using namespace game_globals;
 
-static DialogManager s_dialogManager;
-
 
 EM_JS(void, open_tab_url, (const char* str), {
   //console.log('hello ' + UTF8ToString(str));
   var win = window.open(UTF8ToString(str), '_blank');
-  win.focus();
+  //win.focus(); <- crashy?
 });
 
 
@@ -98,22 +95,58 @@ void draw_game_credits()
   static bool inited = false;
 void draw_dialog()
 {
+  //
+  // Check global game events and attach dialog stems as necessary
+  //
+
+  // Introduction
   if (!inited) 
   {
-    s_dialogManager.init();
+    g_dialogManager.init();
     Dialog d;
     d.load("/data/intro.dialog");
-    s_dialogManager.dialog = d;
+    g_dialogManager.dialog = d;
     inited = true;
   }
 
-  s_dialogManager.draw();
+  // First view (production)
+
+  // First view (production, no rock)
+
+  // First view (production, with rock)
+
+  // First view (launchpad)
+
+  // First view (mining)
+
+  // First view (Econ)
+
+  // First view (Home, bills)
+
+  // Run out of fuel
+
+  // Production all broken
+
+  // Mining event needs power
+
+  // Mining event needs resource
+
+  // Mining event needs storage
+
+  // Cash threshold event 1.  (Add floors...) ($10,000)
+
+  // Cash threshold event 2. (Intro to mining...) ($100,000)
+
+  //
+  // Draw the dialog actually
+  //
+  g_dialogManager.draw();
 }
 
 
 bool no_dialog()
 {
-  return s_dialogManager.dialog.talkEvents.size() == 0;
+  return g_dialogManager.dialog.talkEvents.size() == 0;
 }
 
 
@@ -147,7 +180,7 @@ void drawHeaderBar()
   ImGui::SameLine();
   ImGui::SetCursorPosX(g_windowManager.width / 2 - 140);
   //ImGui::SetCursorPosY(cursor_pos_y);
-  ImGui::Text("Rocks %i/%i", g_gameData.rock, 0); //g_current_week_data.moon_rock_storage_cap);
+  ImGui::Text("Rocks %i/%i", g_gameData.rock, 2000); //g_current_week_data.moon_rock_storage_cap);
 
   // Moonies icon
   ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
@@ -173,6 +206,7 @@ void drawHeaderBar()
 
 void drawFooterBar()
 {
+  ImGuiIO& io = ImGui::GetIO();
   ImGui::SetNextWindowPos(ImVec2(0, g_windowManager.height - 84));
   ImGui::BeginChild(
     "Footer", 
@@ -180,6 +214,9 @@ void drawFooterBar()
     true, 
     ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);   
   
+  //
+  // Locations
+  //
   if (g_gameData.page == Home) im_disable_buttons();
   if (ImGui::Button("Home")) g_gameData.page = Home;
   if (im_is_button_disabled()) im_enable_buttons();
@@ -197,7 +234,7 @@ void drawFooterBar()
 
   if (g_gameData.page == Launchpad) im_disable_buttons();
   int i = 0;
-  //for (auto& j : g_fleet) if (j.data.location == 0 && j.order.pickup_amount == 0) ++i;
+  for (auto& j : g_gameData.fleet) if (j.data.location == 0) ++i;
   std::string name = std::string("(") + std::to_string(i) + std::string(") Launchpad");
   if (ImGui::Button(name.c_str())) g_gameData.page = Launchpad;
   if (im_is_button_disabled()) im_enable_buttons();
@@ -207,12 +244,91 @@ void drawFooterBar()
   if (ImGui::Button("Mining")) g_gameData.page = Mining;
   if (im_is_button_disabled()) im_enable_buttons();
 
+  //
+  // Timers
+  //
+  bool dis = false;
   ImGui::SetCursorPosX(g_windowManager.width - 150);
   ImGui::SetCursorPosY(0);
   ImGui::Text("Week %i", g_gameData.week_counter + 1);
 
   ImGui::SetCursorPosX(g_windowManager.width - 150);
   ImGui::ProgressBar(g_gameData.days / 7.0f, ImVec2(-1, 26), "");
+
+  ImGui::SetCursorPosX(g_windowManager.width - 270);
+  ImGui::SetCursorPosY(6);
+  ImGui::PushFont(io.Fonts->Fonts[2]);
+  dis = g_gameData.timer_speed == 0;
+  if (dis) im_disable_buttons();
+  if (ImGui::Button("||", ImVec2(110, 32)))
+  {
+    // Pause
+    g_gameData.timer_speed = 0;
+  }
+  if (dis) im_enable_buttons();
+  ImGui::PopFont();
+  if (ImGui::IsItemHovered())
+  {
+      ImGui::BeginTooltip();
+      //ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+      ImGui::TextUnformatted("Pause");
+      //ImGui::PopTextWrapPos();
+      ImGui::EndTooltip();
+  }
+
+  ImGui::SetCursorPosX(g_windowManager.width - 270);
+  ImGui::SetCursorPosY(44);
+  dis = g_gameData.timer_speed == 1;
+  if (dis) im_disable_buttons();
+  if (ImGui::Button("##speed1", ImVec2(32, 32)))
+  {
+    g_gameData.timer_speed = 1;
+  }
+  if (dis) im_enable_buttons();
+  if (ImGui::IsItemHovered())
+  {
+      ImGui::BeginTooltip();
+      //ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+      ImGui::TextUnformatted("Slow");
+      //ImGui::PopTextWrapPos();
+      ImGui::EndTooltip();
+  }
+
+    ImGui::SetCursorPosX(g_windowManager.width - 230);
+  ImGui::SetCursorPosY(44);
+  dis = g_gameData.timer_speed == 3;
+  if (dis) im_disable_buttons();
+  if (ImGui::Button("##speed2", ImVec2(32, 32)))
+  {
+    g_gameData.timer_speed = 3;
+  }
+  if (dis) im_enable_buttons();
+  if (ImGui::IsItemHovered())
+  {
+      ImGui::BeginTooltip();
+      //ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+      ImGui::TextUnformatted("Fast");
+      //ImGui::PopTextWrapPos();
+      ImGui::EndTooltip();
+  }
+
+    ImGui::SetCursorPosX(g_windowManager.width - 190);
+  ImGui::SetCursorPosY(44);
+  dis = g_gameData.timer_speed == 6;
+  if (dis) im_disable_buttons();
+  if (ImGui::Button("##speed3", ImVec2(32, 32)))
+  {
+    g_gameData.timer_speed = 6;
+  }
+  if (dis) im_enable_buttons();
+  if (ImGui::IsItemHovered())
+  {
+      ImGui::BeginTooltip();
+      //ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+      ImGui::TextUnformatted("Fastest");
+      //ImGui::PopTextWrapPos();
+      ImGui::EndTooltip();
+  }
 
   ImGui::EndChild();
 }
@@ -321,6 +437,10 @@ void econ_page()
       //const auto& v = g_gameData.day_data;
       //const auto [min, max] = std::minmax_element(begin(v), end(v));
 
+      int h = 10009;
+      if (g_gameDialogs.threshold_1) h = 100009;
+      if (g_gameDialogs.threshold_2) h = 1000009;
+
       ImGui::PushFont(io.Fonts->Fonts[2]);
       if (g_gameData.plot_data_cursor < g_gameData.day_data.size())
       {
@@ -328,7 +448,7 @@ void econ_page()
           g_gameData.day_data[g_gameData.plot_data_cursor].week - 6, 
           g_gameData.day_data[g_gameData.plot_data_cursor].week, 
           -1, 
-          10009, 
+          h, 
           ImGuiCond_Always);
       }
       else
@@ -337,7 +457,7 @@ void econ_page()
           g_gameData.day_data[g_gameData.plot_data_cursor + 1].week - 6, 
           g_gameData.day_data[g_gameData.plot_data_cursor + 1].week, 
           -1, 
-          10009, 
+          h, 
           ImGuiCond_Always);
       }
       ImPlot::BeginPlot(
@@ -385,7 +505,7 @@ void econ_page()
           g_gameData.day_data[g_gameData.plot_data_cursor].week - 6, 
           g_gameData.day_data[g_gameData.plot_data_cursor].week, 
           -1, 
-          15000, 
+          2000, 
           ImGuiCond_Always);
       }
       else
@@ -394,7 +514,7 @@ void econ_page()
           g_gameData.day_data[g_gameData.plot_data_cursor - 1].week - 6, 
           g_gameData.day_data[g_gameData.plot_data_cursor - 1].week, 
           -1, 
-          15000, 
+          2000, 
           ImGuiCond_Always);
       }
       ImPlot::BeginPlot(
@@ -437,14 +557,17 @@ void upgrade_ship_page()
     true, 
     ImGuiWindowFlags_AlwaysAutoResize);   
 
+  bool mute = (g_current_ship->slot1 == 1) || (g_current_ship->slot2 == 1) || (g_current_ship->slot3 == 1);
+  if (mute) im_disable_buttons();
   if (ImGui::Button("Afterburner"))
   {
-    upgrade_ship(1, 2000);
+    upgrade_ship(1, 1000);
     g_gameData.page = Launchpad;
   }
+  if (mute) im_enable_buttons();
   ImGui::Text("Reignites exhaust fuels to");
-  ImGui::Text("go further.");
-  ImGui::Text("$2 000");
+  ImGui::Text("go faster.");
+  ImGui::Text("$1000");
   ImGui::EndChild();
   ImGui::SameLine();
 
@@ -453,15 +576,19 @@ void upgrade_ship_page()
     ImVec2(updrade_x, upgrade_y), 
     true, 
     ImGuiWindowFlags_AlwaysAutoResize);   
+
+  mute = (g_current_ship->slot1 == 2) || (g_current_ship->slot2 == 2) || (g_current_ship->slot3 == 2);
+  if (mute) im_disable_buttons();
   if (ImGui::Button("Launch Stabiliser"))
   {
     upgrade_ship(2, 1000);    
     g_gameData.page = Launchpad;
   }
+  if (mute) im_enable_buttons();
   ImGui::Text("Reduces atmospheric");
   ImGui::Text("turbulence for a smoother");
   ImGui::Text("launch.");
-  ImGui::Text("$2 000");
+  ImGui::Text("$1000");
   ImGui::EndChild();
   ImGui::SameLine();
 
@@ -470,14 +597,17 @@ void upgrade_ship_page()
     ImVec2(updrade_x, upgrade_y), 
     true, 
     ImGuiWindowFlags_AlwaysAutoResize);   
+  mute = (g_current_ship->slot1 == 3) || (g_current_ship->slot2 == 3) || (g_current_ship->slot3 == 3);
+  if (mute) im_disable_buttons();
   if (ImGui::Button("Cargo Space"))
   {    
-    upgrade_ship(3, 2500);    
+    upgrade_ship(3, 1500);    
     g_gameData.page = Launchpad;
   }
+  if (mute) im_enable_buttons();
   ImGui::Text("Increases storage");
-  ImGui::Text("capacity by 500.");
-  ImGui::Text("$2 500");
+  ImGui::Text("capacity by 50.");
+  ImGui::Text("$1500");
   ImGui::EndChild();
   ImGui::SameLine();
 
@@ -486,14 +616,17 @@ void upgrade_ship_page()
     ImVec2(updrade_x, upgrade_y), 
     true, 
     ImGuiWindowFlags_AlwaysAutoResize);   
+  mute = (g_current_ship->slot1 == 4) || (g_current_ship->slot2 == 4) || (g_current_ship->slot3 == 4);
+  if (mute) im_disable_buttons();
   if (ImGui::Button("Flight Control"))
   {
-    upgrade_ship(4, 3000);        
+    upgrade_ship(4, 2000);        
     g_gameData.page = Launchpad;
   }
+  if (mute) im_enable_buttons();
   ImGui::Text("Increased planning accuracy");
   ImGui::Text("reduces journey time.");
-  ImGui::Text("$3 000");
+  ImGui::Text("$2000");
   ImGui::EndChild();
   ImGui::SameLine();
 
@@ -502,23 +635,21 @@ void upgrade_ship_page()
     ImVec2(updrade_x, upgrade_y), 
     true, 
     ImGuiWindowFlags_AlwaysAutoResize);   
-  if (ImGui::Button("Shield"))
-  {
-    upgrade_ship(5, 4000);           
-    g_gameData.page = Launchpad;
-  }
+  // if (ImGui::Button("Shield"))
+  // {
+  //   upgrade_ship(5, 4000);           
+  //   g_gameData.page = Launchpad;
+  // }
   ImGui::Text("Reduces damage to the");
   ImGui::Text("ship, requiring fewer");
   ImGui::Text("repairs.");
-  ImGui::Text("$4 000");
+  ImGui::Text("$4000");
   ImGui::EndChild();
 }
 
 
 void launch_page()
 {
-  //draw_launch_scene(g_rs);
-  
   ImGuiIO& io = ImGui::GetIO();
   
   // Title
@@ -532,14 +663,6 @@ void launch_page()
     g_gameData.page = PAGES::BuyFleet;
   }
   // Fleet list
-  //ImGui::Text("Fleet");
-    
-  // ImGui::BeginChild(
-  //   "Fleet_container_child", 
-  //   ImVec2(0, 480), 
-  //   true, 
-  //   0);  
-
   static bool toggle_button = false;
   static Ship* which_order;
 
@@ -556,20 +679,7 @@ void launch_page()
       true, 
       WINDOW_FLAGS);      
 
-    std::string title_id = "child_id_" + boost::uuids::to_string(i.tag);
-    ImGui::BeginChild(
-      title_id.c_str(), 
-      ImVec2(130, 0), 
-      true, 
-      WINDOW_FLAGS_BORDERLESS);  
-    ImGui::Text("A");
-    // ImGui::PushFont(io.Fonts->Fonts[2]);
-    // ImGui::Text("$%i", i.data.value);
-    // ImGui::PopFont();
-    
     // Upgrades
-    ImGui::EndChild();
-    ImGui::SameLine();
     std::string title_ups = "child_ups_" + boost::uuids::to_string(i.tag);
     ImGui::BeginChild(
       title_ups.c_str(), 
@@ -584,8 +694,8 @@ void launch_page()
     if (ImGui::Button("1")) 
     {
       g_gameData.page = UpgradeShip;
-      // g_current_ship_slot = &(i.slot1);
-      // g_current_ship = &i;
+      g_current_ship_slot = &(i.slot1);
+      g_current_ship = &i;
     }
     if (im_is_button_disabled()) im_enable_buttons();
     ImGui::SameLine();
@@ -594,8 +704,8 @@ void launch_page()
     if (ImGui::Button("2")) 
     {
       g_gameData.page = UpgradeShip;
-      // g_current_ship_slot = &(i.slot2);
-      // g_current_ship = &i;
+      g_current_ship_slot = &(i.slot2);
+      g_current_ship = &i;
     }
     if (im_is_button_disabled()) im_enable_buttons();
     ImGui::SameLine();
@@ -604,8 +714,8 @@ void launch_page()
     if (ImGui::Button("3")) 
     {
       g_gameData.page = UpgradeShip;
-      // g_current_ship_slot = &(i.slot3);
-      // g_current_ship = &i;
+      g_current_ship_slot = &(i.slot3);
+      g_current_ship = &i;
     }
     if (im_is_button_disabled()) im_enable_buttons();
     ImGui::SameLine();
@@ -624,22 +734,10 @@ void launch_page()
     // ImGui::Text("Stats");
     // ImGui::Separator();
     ImGui::Text("Trip time %.1f days", i.data.transit_time);
-    ImGui::Text("Trip cost $%i", i.data.value);
     ImGui::Text("Cargo capacity %i", i.data.capacity);
-    ImGui::PopFont();
-    ImGui::EndChild();
-    ImGui::SameLine();
 
-    std::string title_status = "child_status_" + boost::uuids::to_string(i.tag);
-    ImGui::BeginChild(
-      title_status.c_str(), 
-      ImVec2(220, 0), 
-      true, 
-      WINDOW_FLAGS_BORDERLESS);   
-    // if (i.data.location == 0)   
-    //   ImGui::Text("Ready");
-    // else
-    //   ImGui::Text("In Transit...");
+    ImGui::Text("status:  "); 
+    ImGui::SameLine();
     if (i.data.location == 0)   
       ImGui::Text("No orders");
     else if (i.data.location == 1)   
@@ -651,96 +749,44 @@ void launch_page()
     else if (i.data.location == 4)
       ImGui::Text("Returning");
     else
-      ImGui::Text("Something...");      
+      ImGui::Text("Something...");  
+
+    ImGui::PopFont();
     ImGui::EndChild();
     ImGui::SameLine();
 
     std::string title_order = "child_order_" + boost::uuids::to_string(i.tag);
     ImGui::BeginChild(
       title_order.c_str(), 
-      ImVec2(0, 0), 
+      ImVec2(150, 0), 
       true, 
       WINDOW_FLAGS_BORDERLESS);   
 
-    if (i.order.pickup_amount == 0)
-    {
-      std::string title_button_order = "Order##" + boost::uuids::to_string(i.tag);
-      if (ImGui::Button(title_button_order.c_str()))
-      {
-        toggle_button = !toggle_button;
-        which_order = &i;
-      }
-    }
-    else
-    {
-      // ImGui::Text("Order in place");
-      // ImGui::SameLine();
-      std::string title_button_order = "Change##" + boost::uuids::to_string(i.tag);
-      if (ImGui::Button(title_button_order.c_str()))
-      {
-        toggle_button = !toggle_button;
-        which_order = &i;
-      }
-    }
+    int order = i.order.pickup_location;
+    ImGui::Combo("##orders", &order, "No orders\0Collect from Moon\0");
     ImGui::SameLine();
-    if (ImGui::Checkbox("Repeat", &i.order.repeat))
-    {
 
+    if (i.order.pickup_location != order)
+    {
+      i.order.pickup_location = order;
+      if (order)
+      {
+        i.order.pickup_amount = 1; // ?
+        i.delay = g_gameData.time_tick + 1;
+      }
+      else
+      {
+        i.order.pickup_amount = 0; // ?
+        i.delay = 0;        
+      }
     }
 
-    if (i.order.pickup_amount > 0)
-    {
-      ImGui::Text("Order placed");
-    }
+    //if (i.order.pickup_location)
 
     ImGui::EndChild(); // order
 
     ImGui::EndChild(); // Fleet item
   }
-  //ImGui::EndChild(); // Fleet container
-
-  // Popups
-    if (toggle_button)
-    {
-      ImGui::OpenPopup("order");
-    }
-    else
-    {
-      ImGui::CloseCurrentPopup();
-    }
-    
-    if (ImGui::BeginPopupModal("order", &toggle_button, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-      // ImGui::PushFont(io.Fonts->Fonts[1]);
-      // ImGui::Text("Order");
-      // ImGui::PopFont();
-      // ImGui::Separator();
-      
-      ImGui::Text("How much?");
-      
-      ImGui::PushFont(io.Fonts->Fonts[2]);
-      ImGui::Text("Capacity %i", which_order->data.capacity);
-      ImGui::PopFont();
-
-      static bool s_repeat = false;
-      ImGui::Checkbox("Repeat", &s_repeat);
-
-      if (ImGui::Button("Collect from Joe's"))
-      {
-        toggle_button = false;
-        which_order->order = (Order){ 1, which_order->data.capacity, 1, s_repeat };
-        which_order->delay = g_gameData.time_tick + 1;
-      }       
-
-      if (ImGui::Button("Do nothing"))
-      {
-        toggle_button = false;
-        which_order->order = (Order){ 0, 0, 0 };
-      }        
-
-      ImGui::EndPopup();
-    }
-
 }
 
 
@@ -762,35 +808,127 @@ void draw_mainmenu()
 
     ImVec2 pivot_point_b(238 - 353, 198 - 316);
     ImGui::SetCursorPos(ImVec2(g_windowManager.width/2 - pivot_point_b.x, g_windowManager.height/2 - pivot_point_b.y));      
-    if (ImGui::Button("Free Play"))
+    if (ImGui::Button("About"))
     {
-      //s_dialogManager.dialog.talkEvents.clear();
-      inited = true;
-      g_gameData.page = Home;
+      show_game_credits();
     }
-    //ImGui::End();
   }
 }
 
 
 void mining_page()
 {
-  // not here... draw_mining_scene(g_rs);
+  ImGui::Text("Moon mining base");
+  if (g_gameData.mine_open)
+  {
+    bool mute = g_gameData.cash < 50000 || g_gameData.mine_miner;
+    if (mute) im_disable_buttons();
+    if (ImGui::Button("Build Mine: $50000"))
+    {
+      spend_cash(50000);
+      g_gameData.mine_miner = true;
+    }
+    if (mute) im_enable_buttons();
+    mute = g_gameData.cash < 50000 || g_gameData.mine_power;
+    if (mute) im_disable_buttons();
+    if (ImGui::Button("Build Power: $50000"))
+    {
+      spend_cash(50000);
+      g_gameData.mine_power = true;
+    }
+    if (mute) im_enable_buttons();
+    mute = g_gameData.cash < 50000 || g_gameData.mine_silo;
+    if (mute) im_disable_buttons();
+    if (ImGui::Button("Build Storage: $50000"))
+    {
+      spend_cash(50000);
+      g_gameData.mine_silo = true;
+    }
+    if (mute) im_enable_buttons();
+
+    if ( g_gameData.mine_miner &&  g_gameData.mine_power &&  g_gameData.mine_silo )
+    {
+      if (ImGui::Button("Visit dark side"))
+      {
+        g_dialogManager.dialog.load("/data/dark_side.dialog");
+      }
+    }
+  }
+  else
+  {
+    ImGui::Text("There is some mining activity here but you need a mining permit to build.");
+  }
 }
 
 
 void production_page()
 {
-  // if (ImGui::Button("Upgrade..."))
-  // {
-  //   // ...
-  // }
+  int& current_floor = g_gameData.current_floor;
 
-  //ImGui::Text("Would you like to know more?");
-
-  for (auto& i: g_gameData.processing.conveyors)
+  if (g_gameData.processing.conveyors.size() > 1)
   {
-    ImGui::ProgressBar(i.health, ImVec2(264, 0), "Health");    
+    if (g_gameData.processing.conveyors.size() < 4)
+    {
+      bool mute = g_gameData.cash < 24000;
+      if (mute) im_disable_buttons();
+      if (ImGui::Button("new floor"))
+      {
+        spend_cash(24000);
+        g_gameData.processing.conveyors.push_back( std::vector<Conveyor>() );
+      }
+      if (mute) im_enable_buttons();
+      if (ImGui::IsItemHovered())
+      {
+        ImGui::BeginTooltip();
+        ImGui::TextUnformatted("$24000");
+        ImGui::EndTooltip();
+      }
+    }
+
+    for (int i = g_gameData.processing.conveyors.size(); i > 0; --i)
+    {
+      std::string name = std::string("Floor ") + std::to_string(i);
+      if (current_floor == i - 1)
+      {
+        ImGui::Text("> %s", name.c_str());
+      }
+      else
+      {
+        if (ImGui::Button(name.c_str()))
+        {
+          current_floor = i - 1;
+        }
+      }
+    }
+  }
+
+  int ypos = g_windowManager.height - 250;
+  int xpos = g_windowManager.width - 390;
+  for (auto& i: g_gameData.processing.conveyors[current_floor])
+  {
+
+    if (!i.upgraded)
+    {
+      ImGui::SetCursorPos(ImVec2(xpos-36, ypos));
+      bool mute = g_gameData.cash < 2800;
+      if (mute) im_disable_buttons();
+      std::string text2 = "##" + std::to_string((unsigned long)&i);
+      if (ImGui::Button(text2.c_str()))
+      {
+        spend_cash(2800);
+        i.upgraded = true;
+      }
+      if (mute) im_enable_buttons();
+      if (ImGui::IsItemHovered())
+      {
+          ImGui::BeginTooltip();
+          ImGui::TextUnformatted("Upgrade: $2800");
+          ImGui::EndTooltip();
+      }
+    }
+
+    ImGui::SetCursorPos(ImVec2(xpos, ypos));
+    ImGui::ProgressBar(i.health, ImVec2(124, 0), "Health");    
     if (i.health < 0.51)
     {
       ImGui::SameLine();
@@ -805,12 +943,14 @@ void production_page()
       }
       if (disable) im_enable_buttons();
     }
+    ypos -= 70;
   }
 
   static bool toggle_button = false;
 
-  if (g_gameData.processing.conveyors.size() < 4)
+  if (g_gameData.processing.conveyors[current_floor].size() < 4)
   {
+    ImGui::SetCursorPos(ImVec2(xpos, ypos));
     if (ImGui::Button("Buy New Machine"))
     {
       toggle_button = true;
@@ -828,7 +968,7 @@ void production_page()
   
   if (ImGui::BeginPopupModal("Buy new machine", &toggle_button, ImGuiWindowFlags_AlwaysAutoResize))
   {
-    int cost = 4600;
+    int cost = 1800;
 
     ImGui::Text("Buy new machine for $%i", cost);
     
@@ -836,7 +976,8 @@ void production_page()
     if (disable) im_disable_buttons();
     if (ImGui::Button("Buy"))
     {
-      buy_new_machine();
+      buy_new_machine(current_floor);
+      toggle_button = false;
     }        
     if (disable) im_enable_buttons();
 
@@ -845,9 +986,175 @@ void production_page()
       toggle_button = false;
     }
 
+    ImGui::EndPopup();
+  }
+
+  //
+  // Science
+  //
+  static bool toggle_science = false;
+
+  ypos = 42;
+  xpos = g_windowManager.width - 390;
+  ImGui::SetCursorPos(ImVec2(xpos, ypos));
+  if (ImGui::Button("Research"))
+  {
+    toggle_science = true;
+  }
+
+  if (toggle_science)
+  {
+    ImGui::OpenPopup("Upgrades");
+  }
+  else
+  {
+    ImGui::CloseCurrentPopup();
+  }
+  
+  if (ImGui::BeginPopupModal("Upgrades", &toggle_science, ImGuiWindowFlags_AlwaysAutoResize))
+  {
+    if (g_gameData.science_unlock)
+    {
+      ImGui::Text("Upgrading...");
+      float a = (g_gameData.next_science_level - g_gameData.time_tick) / (7.0f * 17.f * 30.f);
+      ImGui::ProgressBar(a, ImVec2(250.f, 0.f));
+    }
+    else if (g_gameData.science_level < 8)
+    {
+      int cost = (160 + g_gameData.science_level * 80) * (g_gameData.science_level + 1);
+
+      ImGui::Text("Buy next upgrade for $%i", cost);
+      
+      bool disable = g_gameData.cash < cost;
+      if (disable) im_disable_buttons();
+      if (ImGui::Button("Upgrade"))
+      {
+        buy_new_science(cost);
+      }        
+      if (disable) im_enable_buttons();
+    }
+    else
+    {
+      ImGui::Text("Max research level reached");
+    }
+
+    ImGui::Separator();
+
+    if (ImGui::Button("Close"))
+    {
+      toggle_science = false;
+    }
 
     ImGui::EndPopup();
   }
+
+  //
+  // Floors
+  //
+}
+
+
+void draw_ship_yard()
+{
+  ImGuiIO& io = ImGui::GetIO();
+
+    ImGui::PushFont(io.Fonts->Fonts[1]);
+    ImGui::Text("Buy Fleet");
+    ImGui::PopFont();
+    ImGui::Separator();
+      
+    static bool toggle_button = false;
+    static Ship* to_buy;
+
+    for (auto& i: fleets)
+    {
+      if (i.data.value == 0) continue;
+
+      std::string title = "child_" + boost::uuids::to_string(i.tag);
+      //ImGui::SetNextWindowSize(ImVec2(g_windowManager.width, 220));
+      ImGui::BeginChild(
+        title.c_str(), 
+        ImVec2(g_windowManager.width - 20, 130), 
+        true, 
+        0);      
+
+      std::string title_id = "child_id_" + boost::uuids::to_string(i.tag);
+      ImGui::BeginChild(
+        title_id.c_str(), 
+        ImVec2(330, 0), 
+        true, 
+        ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);  
+      ImGui::Text("Fleet / Name / ID");
+      ImGui::EndChild();
+      ImGui::SameLine();
+
+      std::string title_stats = "child_stats_" + boost::uuids::to_string(i.tag);
+      ImGui::BeginChild(
+        title_stats.c_str(), 
+        ImVec2(300, 0), 
+        true, 
+        ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);      
+      ImGui::PushFont(io.Fonts->Fonts[2]);
+      // ImGui::Text("Stats");
+      // ImGui::Separator();
+      ImGui::Text("Trip time %.1f days", i.data.transit_time);
+      ImGui::Text("Trip cost $1000");
+      ImGui::Text("Cargo capacity %i", i.data.capacity);
+      ImGui::PopFont();
+      ImGui::EndChild();
+      ImGui::SameLine();
+
+      ImGui::SameLine();
+
+      ImGui::Text("$%i", i.data.value);
+      ImGui::SameLine();
+
+      bool mute = g_gameData.cash < i.data.value;
+      if (mute) im_disable_buttons();
+      std::string title_buy = "Buy##" + boost::uuids::to_string(i.tag);
+      if (ImGui::Button(title_buy.c_str()))
+      {
+        toggle_button = true;
+        to_buy = &i;
+      }
+      if (mute) im_enable_buttons();
+      
+      ImGui::EndChild(); // Fleet item
+    }
+  
+    if (toggle_button)
+    {
+      ImGui::OpenPopup("Buy");
+    }
+    else
+    {
+      ImGui::CloseCurrentPopup();
+    }
+    if (ImGui::BeginPopupModal("Buy", &toggle_button, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+      ImGui::Text("Purchase for $%i?", to_buy->data.value);
+      
+      ImGui::PushFont(io.Fonts->Fonts[2]);
+      ImGui::Text("Capacity %i", to_buy->data.capacity);
+      ImGui::PopFont();
+
+      if (ImGui::Button("Yes"))
+      {
+        toggle_button = false;
+        // Buy
+        g_gameData.cash -= to_buy->data.value;
+        g_gameData.fleet.push_back(*to_buy);
+        to_buy->data.value = 0;
+      }        
+      ImGui::SameLine();
+      if (ImGui::Button("Nevermind"))
+      {
+        toggle_button = false;          
+      }
+      ImGui::EndPopup();
+    }
+
+    ImGui::Separator();
 }
 
 
@@ -882,6 +1189,35 @@ void home_page()
   // text vehicles in use
   // text mining...
 
-  // text bills outstanding
 
+  ImGui::Text("Factory Overview");
+  ImGui::Separator();
+
+    ImGui::Text("Cash: $%i", g_gameData.cash);
+    ImGui::Text("Moon rock collected this week: %i", g_gameData.current_week_data.moon_rocks_collected);
+
+  ImGui::Separator();
+
+  // text bills outstanding
+  if (g_gameData.tax_bill)
+  {
+    ImGui::Text("Factory Tax Bill: ");
+    ImGui::SameLine();
+    
+    bool mute = g_gameData.cash < 1000000;
+    if (mute) im_disable_buttons();
+    if (ImGui::Button("  $1000000  "))
+    {
+      spend_cash(1000000);
+      g_dialogManager.dialog.load("/data/game_win.dialog");
+      g_gameData.tax_bill = false;
+    }
+    if (mute) im_enable_buttons();
+
+    ImGui::SameLine();
+    if (ImGui::Button("?"))
+    {
+      g_dialogManager.dialog.load("/data/about_tax.dialog");
+    }
+  }
 }

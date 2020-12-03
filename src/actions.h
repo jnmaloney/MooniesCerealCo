@@ -27,10 +27,12 @@ void consume_rock(int x);
 void sell_unit();
 
 // factory actions
-void buy_new_machine();
+void buy_new_machine(int current_floor);
 
 // Ship transport cycle
 bool ship_launch(game_globals::Ship & ship);
 bool ship_collect_rock(game_globals::Ship & ship); // Mine& mine
 bool ship_return(game_globals::Ship & ship);
 bool ship_unload_rock(game_globals::Ship & ship);
+
+void buy_new_science(int cost);

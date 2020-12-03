@@ -81,12 +81,14 @@ void ProcessingScene::draw(RenderSystem* rs)
   //   x = glm::translate(x, glm::vec3(-8.f, 0.f, 0.f));
   // }
 
+  int current_floor = g_gameData.current_floor;
+
   glm::mat4 x(1.0);
   x = glm::translate(x, glm::vec3(9.f, 0.f, -2.5f));
   for (int i = 0; i < 4; ++i)
   {
-    if (i < g_gameData.processing.conveyors.size())
-      draw_conveyor(rs, x, g_gameData.processing.conveyors[i]);
+    if (i < g_gameData.processing.conveyors[current_floor].size())
+      draw_conveyor(rs, x, g_gameData.processing.conveyors[current_floor][i]);
     else
       draw_floor(rs, x);
     x = glm::translate(x, glm::vec3(-8.f, 0.f, 0.f));
@@ -133,7 +135,7 @@ void ProcessingScene::draw_conveyor(RenderSystem* rs, glm::mat4 t, game_globals:
   // Belt
   // rs->m_shaderManager.setShader("Scrolling");
   bool scrolling = conveyor_object.timings.size() || conveyor_object.stock;
-  float scroll_amount = scrolling ? 0.5 * 1.0f/60.0f : 0.0f;
+  float scroll_amount = g_gameData.timer_speed * (scrolling ? 0.5 * 1.0f/60.0f : 0.0f);
   conveyor_object.scroll = fmod(scroll_amount + conveyor_object.scroll, 1.0f);
   rs->m_shaderManager.setParam("Scrolling", "scroll", conveyor_object.scroll);
 

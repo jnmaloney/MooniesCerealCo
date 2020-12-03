@@ -12,6 +12,10 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include "game_screens.h"
+#include "dialog_manager.h"
+
+
+inline DialogManager g_dialogManager;
 
 
 
@@ -59,7 +63,6 @@ static Order nil_order = (Order){ 0, 0, 0 };
 struct ShipData
 {
   float transit_time;
-  //  int filled;
   int capacity;
   int value;
   int location;
@@ -92,11 +95,14 @@ struct Conveyor
   int processing_time = 232;
   int conveying_time = 600;
   std::deque<int> timings;
+  bool upgraded;
   void tick();
 };
 struct ProcessingRoom
 {
-  std::vector<Conveyor> conveyors;
+  std::vector<
+    std::vector<Conveyor> 
+      > conveyors;
   void tick();
 };
 
@@ -133,10 +139,11 @@ struct Launch
 
 
 static   std::vector<Ship> fleets = {
-      Ship((ShipData){ 3.49, 1000, 35000, 0 }),
-      Ship((ShipData){ 4.0, 1500, 70000, 0 }),
-      Ship((ShipData){ 3.2, 800, 75000, 0}),
-      Ship((ShipData){ 9.0, 7500, 900000, 0 }),
+      Ship((ShipData){ 3.49, 80, 4000, 0 }),
+      Ship((ShipData){ 4.0, 110, 5000, 0 }),
+      Ship((ShipData){ 3.8, 320, 13000, 0 }),
+      Ship((ShipData){ 3.0, 200, 25000, 0}),
+      Ship((ShipData){ 9.0, 800, 40000, 0 }),
     };  
 
 
@@ -158,14 +165,53 @@ static PAGES&                             get_page();
 };
 
 
+class JoesMine
+{
+  int rock_taken;
+  void tick();
+};
+
+
+class KimsMine
+{
+  bool open_kims_mine = false;
+  int next_invoice_tick;
+  void tick();
+};
+
+
+class BobsMine
+{
+  bool open_bobs_mine = false;
+  int next_invoice_tick;
+  void tick();
+};
+
+
+class MooniesMine
+{
+
+};
+
+
+class YourMine
+{
+  int processing;
+  int power;
+  int storage;
+  void tick();
+  int rocks_available;
+};
+
+
 class GameData
 {
 public:
   GameData();
 
  // Resources
- int                      cash = 160;
- int                      rock = 1500;
+ int                      cash = 150;
+ int                      rock = 0;
  float                    fuel;
  WeekData                 current_week_data;
  std::vector<Ship>        fleet;
@@ -185,7 +231,7 @@ public:
  //float                    time = 0.f;
  // new
  float                    days = 0.f;
- float                    timer_speed = 1.0f;
+ int                      timer_speed = 1;
 
  // Plots data
  std::vector<DayData>     day_data;
@@ -203,12 +249,51 @@ public:
   void day_snapshot();
   void update_timer();
 
+  JoesMine joesMine;
+  KimsMine kimsMine;
+  BobsMine bobsMine;
+  MooniesMine mooniesMine;
+  YourMine yourMine;
+
+  int science_level = 0;
+  bool science_unlock = false;
+  int next_science_level;
+
+  int current_floor = 0;
+  bool mine_open;
+  bool mine_miner;
+  bool mine_power;
+  bool mine_silo;
+  bool tax_bill = true;
+  bool game_over;
 };
+
+
+struct GameDialogs
+{
+  bool intro;
+  bool first_econ;
+  bool first_launchpad;
+  bool first_processing;
+  bool first_mining;
+  bool first_bills;
+  bool first_science;
+  bool production_broken;
+  bool production_broken_again;
+  bool threshold_1;
+  bool threshold_2;
+  void tick();
+};
+
 
 } // namespace
 
 
+inline game_globals::GameDialogs g_gameDialogs;
 inline game_globals::GameData g_gameData = game_globals::GameData();
+
+inline int* g_current_ship_slot;
+inline game_globals::Ship* g_current_ship = 0;
 
 // std::vector<WeekData>&    g_econ_history          = SecretFunctions::get_econ_history();
 // WeekData&                 g_current_week_data     = SecretFunctions::get_current_week_data();

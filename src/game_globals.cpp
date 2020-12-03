@@ -3,39 +3,6 @@
 #include <algorithm>
 
 
-int* g_current_ship_slot;
-game_globals::Ship* g_current_ship = 0;
-void upgrade_ship(int upgrade, int cost)
-{
-  //g_gameData.current_week_data.spent += cost;
-  g_gameData.cash -= cost;
-
-  *g_current_ship_slot = upgrade;
-
-  if (g_current_ship == 0) return;
-
-  if (upgrade == 1)
-  {
-    g_current_ship->data.value *= 0.9; // ?? launch_cost
-  }
-  if (upgrade == 2)
-  {
-    g_current_ship->data.value *= 0.9; // ?? launch_cost
-  }
-  if (upgrade == 3)
-  {
-    g_current_ship->data.capacity += 500;
-  }
-  if (upgrade == 4)
-  {
-    g_current_ship->data.value *= 0.8; // ?? launch_cost
-  }
-  if (upgrade == 5)
-  {
-
-  }
-}
-
 
 namespace game_globals {
 
@@ -80,11 +47,19 @@ void GameData::update_timer()
   // Global frame counter
   time_tick += 1;
 
+  // science updata
+  if (science_unlock && time_tick >= next_science_level)
+  {
+    science_unlock = false;
+    science_level += 1;
+  }
+
   // Stats update
   day_data[plot_data_cursor].cash_total = cash;
   day_data[plot_data_cursor].rock_total = rock;
   
-  days += timer_speed * (1.0/30.);
+  //days += timer_speed * (1.0/30.);
+  days += (1.0/16.0) * (1.0/30.);   // Slow
   if (days >= 7.0f)
   {
     day_snapshot();
@@ -113,9 +88,10 @@ void GameData::update_timer()
       {
         // printf("launching a nyway\n");
         // ship_launch(i);
+        if (i.order.pickup_location)
+          ship_launch(i);
       }
     }
-
   }
 }
 
@@ -134,7 +110,8 @@ void Mine::tick()
 
 void ProcessingRoom::tick()
 {
-  for (auto& i : conveyors) i.tick();
+  for (auto& floor : conveyors)
+    for (auto& i : floor) i.tick();
 }
 
 
@@ -159,17 +136,20 @@ void Conveyor::tick()
   {
     return;
   }
-  else
+  else if (timings.size())
   {
     float ticks_per_day = 600.f;
     float tick_lifetime = ticks_per_day * 7.0f * 5.0f;
+    if (upgraded) tick_lifetime *= 3;
     health -= 1.0f / tick_lifetime;
   }
   
   //
   // Timing for production
   //
-  if (process_timer >= processing_time)
+  float factor = 1.0;
+  if (upgraded) factor = 2.2f;
+  if (process_timer * factor >= processing_time)
   {
     // Stock for prodution
     if (g_gameData.rock > 5)
@@ -183,6 +163,85 @@ void Conveyor::tick()
   {
     process_timer += 1;
   }  
+}
+
+
+void GameDialogs::tick()
+{
+  // What events need to happen?
+  // bool intro;
+  // bool first_econ;
+  if (first_econ == false && g_gameData.page == Econ)
+  {
+    first_econ = true;
+    g_dialogManager.dialog.load("/data/first_econ.dialog");    
+  }
+  // bool first_launchpad;
+  if (first_launchpad == false && g_gameData.page == Launchpad)
+  {
+    first_launchpad = true;
+    g_dialogManager.dialog.load("/data/first_launchpad.dialog");    
+  }
+  // bool first_processing;
+  if (first_processing == false && g_gameData.page == Processing)
+  {
+    first_processing = true;
+    g_dialogManager.dialog.load("/data/first_processing.dialog");    
+  }
+  // bool first_mining;
+  if (first_mining == false && g_gameData.page == Mining)
+  {
+    first_mining = true;
+    g_dialogManager.dialog.load("/data/first_mining.dialog");    
+  }
+  // bool first_bills;
+  // bool first_science;
+  // bool production_broken;
+  bool all_broken = true;
+  for (auto& floor: g_gameData.processing.conveyors)
+  {
+    for (auto& i: floor)
+    {
+      if (i.health > 0)
+      {
+        all_broken = false;
+        break;
+      }
+    }
+    if (all_broken == false) break;
+  }
+  if (all_broken)
+  {
+    if (production_broken == false)
+    {
+      g_dialogManager.dialog.load("/data/all_broken.dialog");
+      production_broken = true;
+    }
+    else if (production_broken_again == false)
+    {
+      g_dialogManager.dialog.load("/data/all_broken_again.dialog");
+      production_broken_again = true;
+    }
+    
+  }
+  // bool threshold_1;
+  if (threshold_1 == false && (g_gameData.cash > 10000 || g_gameData.week_counter >= 20))
+  {
+    threshold_1 = true;
+    // New floor
+    g_gameData.processing.conveyors.push_back( std::vector<Conveyor>() );
+    // Dialog
+    g_dialogManager.dialog.load("/data/threshold_1.dialog");
+  }
+  // bool threshold_2;
+  if (threshold_2 == false && (g_gameData.cash > 100000 || g_gameData.week_counter >= 39))
+  {
+    threshold_2 = true;
+    // Open mine
+    g_gameData.mine_open = true;
+    // Dialog
+    g_dialogManager.dialog.load("/data/threshold_2.dialog");
+  }
 }
 
 

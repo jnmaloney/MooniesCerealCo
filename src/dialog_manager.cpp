@@ -19,7 +19,7 @@ void DialogManager::draw()
 
 
   // Window (fullscreen)
-    static int FULL_SCREEN_FLAGS = ImGuiWindowFlags_NoTitleBar | 
+  static int FULL_SCREEN_FLAGS = ImGuiWindowFlags_NoTitleBar | 
                           ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                           ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
                           ImGuiWindowFlags_NoBringToFrontOnFocus |

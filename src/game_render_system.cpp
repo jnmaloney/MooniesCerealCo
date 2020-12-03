@@ -49,12 +49,20 @@ void loop()
   // Audio
   g_audioManager.tick();
 
-  // Logic stuff
-  g_gameData.processing.tick();
-  g_gameData.mining.tick();
-  //g_gameData.launches.loop();
+  // Events
+  g_gameDialogs.tick();
 
-  g_gameData.update_timer();
+  //   Timer repetition
+  if (no_dialog() && g_gameData.page != MainMenu && !g_gameData.game_over)
+  for (int i = 0; i < g_gameData.timer_speed; ++i)
+  {
+    // Logic stuff
+    g_gameData.processing.tick();
+    g_gameData.mining.tick();
+    //g_gameData.launches.loop();
+
+    g_gameData.update_timer();
+  }
 
   ImGuiIO& io = ImGui::GetIO();
 
@@ -117,7 +125,7 @@ void loop()
       51
     );
 
-    if (no_dialog())
+    if (no_dialog() && !g_gameData.game_over)
     {
       // Card ends.. go to Home Screen
       g_gameData.page = Home;
@@ -133,111 +141,7 @@ void loop()
   else if (g_gameData.page == BuyFleet)
   {
     drawHeaderBar();
-
-    ImGui::PushFont(io.Fonts->Fonts[1]);
-    ImGui::Text("Buy Fleet");
-    ImGui::PopFont();
-    ImGui::Separator();
-      
-    static bool toggle_button = false;
-    static Ship* to_buy;
-
-    for (auto& i: fleets)
-    {
-      if (i.data.value == 0) continue;
-
-      std::string title = "child_" + boost::uuids::to_string(i.tag);
-      //ImGui::SetNextWindowSize(ImVec2(g_windowManager.width, 220));
-      ImGui::BeginChild(
-        title.c_str(), 
-        ImVec2(g_windowManager.width - 20, 130), 
-        true, 
-        0);      
-
-      std::string title_id = "child_id_" + boost::uuids::to_string(i.tag);
-      ImGui::BeginChild(
-        title_id.c_str(), 
-        ImVec2(330, 0), 
-        true, 
-        ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);  
-      ImGui::Text("Fleet / Name / ID");
-      ImGui::EndChild();
-      ImGui::SameLine();
-
-      std::string title_stats = "child_stats_" + boost::uuids::to_string(i.tag);
-      ImGui::BeginChild(
-        title_stats.c_str(), 
-        ImVec2(300, 0), 
-        true, 
-        ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);      
-      ImGui::PushFont(io.Fonts->Fonts[2]);
-      // ImGui::Text("Stats");
-      // ImGui::Separator();
-      ImGui::Text("Trip time %.1f days", i.data.transit_time);
-      ImGui::Text("Trip cost $1000");
-      ImGui::Text("Cargo capacity %i", i.data.capacity);
-      ImGui::PopFont();
-      ImGui::EndChild();
-      ImGui::SameLine();
-
-      std::string title_status = "child_status_" + boost::uuids::to_string(i.tag);
-      ImGui::BeginChild(
-        title_status.c_str(), 
-        ImVec2(300, 0), 
-        true, 
-        ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration);   
-      ImGui::Text("$%i", i.data.value);
-
-      ImGui::SameLine();
-      ImGui::Button("Appraise");
-
-      ImGui::EndChild();
-      ImGui::SameLine();
-
-      std::string title_buy = "Buy##" + boost::uuids::to_string(i.tag);
-      if (ImGui::Button(title_buy.c_str()))
-      {
-        toggle_button = true;
-        to_buy = &i;
-      }
-      
-      ImGui::EndChild(); // Fleet item
-    }
-  
-    if (toggle_button)
-    {
-      ImGui::OpenPopup("Buy");
-    }
-    else
-    {
-      ImGui::CloseCurrentPopup();
-    }
-    if (ImGui::BeginPopupModal("Buy", &toggle_button, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-      ImGui::Text("Purchase for $%i?", to_buy->data.value);
-      
-      ImGui::PushFont(io.Fonts->Fonts[2]);
-      ImGui::Text("Capacity %i", to_buy->data.capacity);
-      ImGui::PopFont();
-
-      if (ImGui::Button("Yes"))
-      {
-        toggle_button = false;
-        // Buy
-        g_gameData.cash -= to_buy->data.value;
-        g_gameData.fleet.push_back(*to_buy);
-        to_buy->data.value = 0;
-      }        
-      ImGui::SameLine();
-      if (ImGui::Button("Nevermind"))
-      {
-        toggle_button = false;          
-      }
-      ImGui::EndPopup();
-    }
-
-    ImGui::Separator();
-
+    drawContent(&draw_ship_yard);
     drawBackBar(Launchpad);
   }
 
